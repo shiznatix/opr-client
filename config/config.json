@@ -1,0 +1,4 @@
+{
+  "port": 9091,
+  "serverHost": "http://localhost:9090"
+}
