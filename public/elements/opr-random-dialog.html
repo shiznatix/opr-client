@@ -1,0 +1,26 @@
+<dom-module id="opr-random-dialog">
+	<template>
+		<paper-dialog
+			entry-animation="scale-up-animation"
+			exit-animation="fade-out-animation"
+			id="randomDialog">
+
+			<h2>Random</h2>
+			<p>RANDOM PLAYLIST SIZE FORM HERE</p>
+			<div class="buttons">
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button dialog-confirm>Enqueue</paper-button>
+				<paper-button dialog-confirm autofocus>Play</paper-button>
+			</div>
+		</paper-dialog>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-random-dialog',
+
+			open: () => {
+				this.randomDialog.open();
+			},
+		});
+	</script>
+</dom-module>

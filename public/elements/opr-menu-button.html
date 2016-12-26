@@ -1,0 +1,31 @@
+<dom-module id="opr-menu-button">
+	<template>
+		<style>
+			paper-menu {
+				display: block;
+			}
+			paper-menu-button {
+				margin: auto;
+			}
+			.item {
+				max-width: 300px;
+			}
+		</style>
+
+		<paper-menu-button>
+			<paper-icon-button icon="menu" class="dropdown-trigger" alt="menu"></paper-icon-button>
+			<paper-menu class="dropdown-content">
+				<paper-item>Whoa</paper-item>
+				<paper-item>Whoa</paper-item>
+				<paper-item>Whoa</paper-item>
+				<paper-item>Whoa</paper-item>
+				<paper-item>Whoa</paper-item>
+			</paper-menu>
+		</paper-menu-button>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-menu-button',
+		});
+	</script>
+</dom-module>

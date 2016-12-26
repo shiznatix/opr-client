@@ -1,0 +1,43 @@
+<dom-module id="opr-toolbar">
+	<template>
+		<style>
+			:host {
+				@apply(--layout-horizontal);
+				@apply(--layout-center);
+				background-color: var(--paper-blue-500);
+				color: var(--paper-blue-50);
+				padding: 6px 8px;
+			}
+
+			h1 {
+				font-size: 14px;
+				flex-grow: 1;
+				margin: 9px 0;
+			}
+
+			iron-icon {
+				margin-right: 0.5em;
+			}
+
+			@media (min-width: 640px) {
+				iron-icon,
+				paper-icon-button {
+					margin-right: 1.5em;
+				}
+
+				iron-icon:first-child {
+					margin-left: 1em;
+				}
+			}
+		</style>
+
+		<iron-icon icon="weekend"></iron-icon>
+		<h1>OMX Remote</h1>
+		<opr-menu-button></opr-menu-button>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-toolbar',
+		});
+	</script>
+</dom-module>

@@ -1,0 +1,88 @@
+<dom-module id="opr-remote">
+	<template>
+		<style>
+			paper-button {
+				width: 100%;
+				background-color: #e8e8e8;
+			}
+			.flex-horizontal {
+				@apply(--layout-horizontal);
+				margin-top: 10px;
+			}
+		</style>
+
+		<iron-ajax
+			id="commandAjax"
+			handle-as="json"
+			on-response="handleResponse">
+		</iron-ajax>
+
+		<div class="container flex-horizontal">
+			<paper-button raised on-tap="onTap" id="previous">Previous</paper-button>
+			<paper-button raised on-tap="onTap" id="next">Next</paper-button>
+		</div>
+
+		<div class="container flex-horizontal">
+			<paper-button raised on-tap="onTap" id="play-pause">Play/Pause</paper-button>
+			<paper-button raised on-tap="onTap" id="play-file">Play file</paper-button>
+		</div>
+
+		<div class="container flex-horizontal">
+			<paper-button raised on-tap="onTap" id="back">Back</paper-button>
+			<paper-button raised on-tap="onTap" id="forward">Forward</paper-button>
+		</div>
+
+		<div class="container flex-horizontal">
+			<paper-button raised on-tap="onTap" id="random">Random</paper-button>
+		</div>
+
+		<div class="container flex-horizontal">
+			<paper-button raised on-tap="onTap" id="vol-down">Vol down</paper-button>
+			<paper-button raised on-tap="onTap" id="vol-up">Vol up</paper-button>
+		</div>
+
+		<div class="container flex-horizontal">
+			<paper-button raised>Browse</paper-button>
+		</div>
+
+		<opr-random-dialog id="randomDialogElement"></opr-random-dialog>
+		<opr-play-file-dialog id="playFileDialogElement"></opr-play-file-dialog>
+
+		<paper-toast id="toast"></paper-toast>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-remote',
+
+			onTap: (e) => {
+				const id = e.target.getAttribute('id');
+
+				if ('random' === id) {
+					this.randomDialogElement.open();
+				} else if ('play-file' === id) {
+					this.playFileDialogElement.open((playPosition) => {
+						commandAjax.url = '/play-at';
+						commandAjax.body = {
+							'position': playPosition,
+						};
+						commandAjax.method = 'POST';
+						commandAjax.contentType = 'application/x-www-form-urlencoded';
+						commandAjax.generateRequest();
+					});
+				}
+			},
+
+			handleResponse: (e) => {
+				const response = e.detail.response;
+
+				if (!response.success) {
+					this.toast.text = 'Error!';
+				} else {
+					this.toast.text = 'Success!';
+				}
+
+				this.toast.open();
+			},
+		});
+	</script>
+</dom-module>

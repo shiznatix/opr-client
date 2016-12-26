@@ -1,0 +1,78 @@
+<dom-module id="opr-play-file-dialog">
+	<template>
+		<iron-ajax
+			id="currentPlaylistAjax"
+			url="/current-playlist"
+			handle-as="json"
+			last-response="{{ajaxResponse}}"
+			on-response="handleResponse">
+		</iron-ajax>
+
+		<paper-dialog
+			entry-animation="scale-up-animation"
+			exit-animation="fade-out-animation"
+			id="playFileDialog">
+
+			<h2>Play file</h2>
+
+			<paper-spinner active id="playFileLoadingSpinner"></paper-spinner>
+
+			<paper-radio-group on-change="positionOnChange" id="positionRadio" attr-for-selected="value">
+				<template is="dom-repeat" items="[[ajaxResponse.data]]">
+					<paper-radio-button value="[[item.position]]">[[item.fileName]]</paper-radio-button>
+					<br />
+				</template>
+			</paper-radio-group>
+
+			<div class="buttons">
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button dialog-confirm autofocus disabled id="playButton" on-tap="playPressed">Play</paper-button>
+			</div>
+		</paper-dialog>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-play-file-dialog',
+
+			_selectedPosition: -1,
+			_playPositionCallback: null,
+
+			clearSelectedPosition: () => {
+				this.positionRadio.select(-1);
+				this._selectedPosition = -1;
+				this.playButton.disabled = true;
+			},
+
+			open: (playPositionCallback) => {
+				this._playPositionCallback = playPositionCallback;
+				console.log(this._selectedPosition);
+				//this.clearSelectedPosition();
+				this.positionRadio.hidden = true;
+				this.playFileLoadingSpinner.hidden = false;
+				this.playFileDialog.open();
+				this.currentPlaylistAjax.generateRequest();
+			},
+
+			handleResponse: () => {
+				//this.clearSelectedPosition();
+				this.positionRadio.hidden = false;
+				this.playFileLoadingSpinner.hidden = true;
+			},
+
+			positionOnChange: (e) => {
+				const target = e.target;
+
+				this._selectedPosition = target.value;
+				this.playButton.disabled = false;
+			},
+
+			playPressed: (e) => {
+				if (this._selectedPosition < 1) {
+					return;
+				}
+
+				this._playPositionCallback(this._selectedPosition);
+			},
+		});
+	</script>
+</dom-module>
