@@ -1,6 +1,7 @@
 const currentDir = __dirname,
 	config = require(currentDir + '/config/config.json'),
 	express = require('express'),
+	bodyParser = require('body-parser'),
 	player = require(currentDir + '/lib/player.js'),
 	playlist = require(currentDir + '/lib/playlist.js'),
 	server = require(currentDir + '/lib/server.js'),
@@ -26,6 +27,11 @@ function respond(response, error, data = null) {
 
 	return successResponse(response, data);
 }
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+	'extended': true,
+}));
 
 // Public files
 app.use(express.static(__dirname + '/public'));
@@ -90,19 +96,31 @@ app.get('/next', function(request, response) {
 			errorResponse(response, data);
 		});
 });
+app.post('/play-at', function(request, response) {
+	playlist.playAt(request.body.position)
+		.then(function(data) {
+			successResponse(response, data);
+		})
+		.catch(function(error) {
+			errorResponse(response, error);
+		});
+});
 
 // API play routes
 app.post('/random', function(request, response) {
-	const params = {
-		'shows': request.body.shows,
-		'playlistSize': request.body.playlistSize,
-		'enqueue': !!request.body.enqueue,
-	};
-
 	server.random(request.body.shows, request.body.playlistSize)
 		.then(function(data) {
-			playlist.set(data);
+			// respond as soon as possible
 			successResponse(response, data);
+
+			if (request.body.enqueue) {
+				playlist.enqueue(data);
+			} else {
+				playlist.set(data)
+					.then(function() {
+						player.playAt(0);
+					});
+			}
 		})
 		.catch(function(error) {
 			errorResponse(response, error);
