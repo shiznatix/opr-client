@@ -6,11 +6,24 @@
 			id="randomDialog">
 
 			<h2>Random</h2>
-			<p>RANDOM PLAYLIST SIZE FORM HERE</p>
+
+			<paper-radio-group selected="{{amount}}" attr-for-selected="value">
+				<paper-radio-button value="1">1</paper-radio-button>
+				<br />
+				<paper-radio-button value="2">2</paper-radio-button>
+				<br />
+				<paper-radio-button value="3">3</paper-radio-button>
+				<br />
+				<paper-radio-button value="5">5</paper-radio-button>
+				<br />
+				<paper-radio-button value="10">10</paper-radio-button>
+				<br />
+			</paper-radio-group>
+
 			<div class="buttons">
 				<paper-button dialog-dismiss>Cancel</paper-button>
-				<paper-button dialog-confirm>Enqueue</paper-button>
-				<paper-button dialog-confirm autofocus>Play</paper-button>
+				<paper-button dialog-confirm on-tap="enqueuePressed">Enqueue</paper-button>
+				<paper-button dialog-confirm on-tap="playPressed">Play</paper-button>
 			</div>
 		</paper-dialog>
 	</template>
@@ -18,8 +31,26 @@
 		Polymer({
 			is: 'opr-random-dialog',
 
-			open: () => {
-				this.randomDialog.open();
+			randomCallback: null,
+
+			properties: {
+				amount: {
+					type: Number,
+					value: 5,
+				},
+			},
+
+			open: function(randomCallback) {
+				this.randomCallback = randomCallback;
+				this.$.randomDialog.open();
+			},
+
+			enqueuePressed: function() {
+				this.randomCallback('enqueue', this.amount);
+			},
+
+			playPressed: function() {
+				this.randomCallback('play', this.amount);
 			},
 		});
 	</script>

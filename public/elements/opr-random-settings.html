@@ -1,0 +1,43 @@
+<dom-module id="opr-random-settings">
+	<template>
+		<style>
+			.flex-horizontal {
+				@apply(--layout-horizontal);
+				margin-top: 10px;
+			}
+		</style>
+
+		<iron-ajax
+			id="randomSettingsAjax"
+			url="/shows"
+			handle-as="json"
+			last-response="{{ajaxResponse}}"
+			on-response="handleResponse">
+		</iron-ajax>
+
+		<iron-accordions>
+			<template is="dom-repeat" items="[[ajaxResponse.data]]">
+				<iron-accordion>
+					<h2 header>[[item.categoryName]]</h2>
+
+					<template is="dom-repeat" items="[[item.shows]]">
+						<p>[[item]]</p>
+					</template>
+				</iron-accordion>
+			</template>
+		</iron-accordions>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-random-settings',
+
+			attached: function() {
+				this.$.randomSettingsAjax.generateRequest();
+			},
+
+			handleResponse: function(response) {
+				console.log(response);
+			},
+		});
+	</script>
+</dom-module>

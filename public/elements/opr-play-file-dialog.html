@@ -26,7 +26,7 @@
 
 			<div class="buttons">
 				<paper-button dialog-dismiss>Cancel</paper-button>
-				<paper-button dialog-confirm autofocus disabled id="playButton" on-tap="playPressed">Play</paper-button>
+				<paper-button dialog-confirm disabled id="playButton" on-tap="playPressed">Play</paper-button>
 			</div>
 		</paper-dialog>
 	</template>
@@ -34,44 +34,43 @@
 		Polymer({
 			is: 'opr-play-file-dialog',
 
-			_selectedPosition: -1,
-			_playPositionCallback: null,
+			selectedPosition: -1,
+			playPositionCallback: null,
 
-			clearSelectedPosition: () => {
-				this.positionRadio.select(-1);
-				this._selectedPosition = -1;
-				this.playButton.disabled = true;
+			clearSelectedPosition: function() {
+				this.$.positionRadio.select(-1);
+				this.selectedPosition = -1;
+				this.$.playButton.disabled = true;
 			},
 
-			open: (playPositionCallback) => {
-				this._playPositionCallback = playPositionCallback;
-				console.log(this._selectedPosition);
-				//this.clearSelectedPosition();
-				this.positionRadio.hidden = true;
-				this.playFileLoadingSpinner.hidden = false;
-				this.playFileDialog.open();
-				this.currentPlaylistAjax.generateRequest();
+			open: function(playPositionCallback) {
+				this.playPositionCallback = playPositionCallback;
+				this.clearSelectedPosition();
+				this.$.positionRadio.hidden = true;
+				this.$.playFileLoadingSpinner.hidden = false;
+				this.$.playFileDialog.open();
+				this.$.currentPlaylistAjax.generateRequest();
 			},
 
-			handleResponse: () => {
-				//this.clearSelectedPosition();
-				this.positionRadio.hidden = false;
-				this.playFileLoadingSpinner.hidden = true;
+			handleResponse: function() {
+				this.clearSelectedPosition();
+				this.$.positionRadio.hidden = false;
+				this.$.playFileLoadingSpinner.hidden = true;
 			},
 
-			positionOnChange: (e) => {
+			positionOnChange: function(e) {
 				const target = e.target;
 
-				this._selectedPosition = target.value;
-				this.playButton.disabled = false;
+				this.selectedPosition = target.value;
+				this.$.playButton.disabled = false;
 			},
 
-			playPressed: (e) => {
-				if (this._selectedPosition < 1) {
+			playPressed: function(e) {
+				if (this.selectedPosition < 1) {
 					return;
 				}
 
-				this._playPositionCallback(this._selectedPosition);
+				this.playPositionCallback(this.selectedPosition);
 			},
 		});
 	</script>

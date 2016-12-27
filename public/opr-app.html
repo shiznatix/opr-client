@@ -1,14 +1,35 @@
-<link rel="import" href="./elements/opr-elements.html">
+<link rel="import" href="/elements/opr-elements.html">
 
 <dom-module id="opr-app">
 	<template>
 		<style include="opr-shared-styles"></style>
-		<opr-toolbar></opr-toolbar>
-		<opr-remote></opr-remote>
+		<opr-toolbar id="toolbar"></opr-toolbar>
+
+		<iron-pages
+			selected="[[page]]"
+			attr-for-selected="name"
+			role="main">
+
+			<opr-remote name="remote"></opr-remote>
+			<opr-random-settings name="random-settings"></opr-random-settings>
+		</iron-pages>
 	</template>
 	<script>
 		Polymer({
 			is: 'opr-app',
+
+			properties: {
+				page: {
+					type: String,
+					value: 'remote',
+				},
+			},
+
+			ready: function() {
+				this.$.toolbar.setMenuButtonClickListener((buttonTag) => {
+					this.page = buttonTag;
+				});
+			},
 		});
 	</script>
 </dom-module>

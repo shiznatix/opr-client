@@ -54,34 +54,44 @@
 		Polymer({
 			is: 'opr-remote',
 
-			onTap: (e) => {
+			sendCommand: function(url, method, body) {
+				commandAjax.url = `/${url}`;
+				commandAjax.body = body;
+				commandAjax.method = method;
+				commandAjax.contentType = ('POST' === method ? 'application/x-www-form-urlencoded' : null);
+				commandAjax.generateRequest();
+			},
+
+			onTap: function(e) {
 				const id = e.target.getAttribute('id');
 
 				if ('random' === id) {
-					this.randomDialogElement.open();
+					this.$.randomDialogElement.open((method, amount) => {
+						this.sendCommand('random', 'POST', {
+							method: method,
+							amount: amount,
+							showNames: [],
+						});
+					});
 				} else if ('play-file' === id) {
-					this.playFileDialogElement.open((playPosition) => {
-						commandAjax.url = '/play-at';
-						commandAjax.body = {
-							'position': playPosition,
-						};
-						commandAjax.method = 'POST';
-						commandAjax.contentType = 'application/x-www-form-urlencoded';
-						commandAjax.generateRequest();
+					this.$.playFileDialogElement.open((playPosition) => {
+						this.sendCommand('play-at', 'POST', {
+							position: playPosition,
+						});
 					});
 				}
 			},
 
-			handleResponse: (e) => {
+			handleResponse: function(e) {
 				const response = e.detail.response;
 
 				if (!response.success) {
-					this.toast.text = 'Error!';
+					this.$.toast.text = response.error;
 				} else {
-					this.toast.text = 'Success!';
+					this.$.toast.text = response.data;
 				}
 
-				this.toast.open();
+				this.$.toast.open();
 			},
 		});
 	</script>

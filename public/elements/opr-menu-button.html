@@ -15,17 +15,25 @@
 		<paper-menu-button>
 			<paper-icon-button icon="menu" class="dropdown-trigger" alt="menu"></paper-icon-button>
 			<paper-menu class="dropdown-content">
-				<paper-item>Whoa</paper-item>
-				<paper-item>Whoa</paper-item>
-				<paper-item>Whoa</paper-item>
-				<paper-item>Whoa</paper-item>
-				<paper-item>Whoa</paper-item>
+				<paper-item on-tap="openRandomSettings">Random settings</paper-item>
 			</paper-menu>
 		</paper-menu-button>
 	</template>
 	<script>
 		Polymer({
 			is: 'opr-menu-button',
+
+			listener: null,
+
+			setMenuButtonClickListener: function(listener) {
+				this.listener = listener;
+			},
+
+			openRandomSettings: function() {
+				if (this.listener) {
+					this.listener('random-settings');
+				}
+			},
 		});
 	</script>
 </dom-module>

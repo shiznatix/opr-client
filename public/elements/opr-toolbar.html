@@ -33,11 +33,15 @@
 
 		<iron-icon icon="weekend"></iron-icon>
 		<h1>OMX Remote</h1>
-		<opr-menu-button></opr-menu-button>
+		<opr-menu-button id="menuButton"></opr-menu-button>
 	</template>
 	<script>
 		Polymer({
 			is: 'opr-toolbar',
+
+			setMenuButtonClickListener: function(listener) {
+				this.$.menuButton.setMenuButtonClickListener(listener);
+			},
 		});
 	</script>
 </dom-module>
