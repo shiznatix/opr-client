@@ -28,7 +28,10 @@
 			}
 		</style>
 
-		<content></content>
+		<iron-location path="{{path}}"></iron-location>
+
+		<iron-icon icon="arrow-back" id="backIcon" on-tap="backIconTapped"></iron-icon>
+		<iron-icon icon="weekend" id="appIcon" on-tap="appIconTapped"></iron-icon>
 		<h1>OMX Remote</h1>
 		<opr-menu-button id="menuButton"></opr-menu-button>
 	</template>
@@ -36,9 +39,28 @@
 		Polymer({
 			is: 'opr-toolbar',
 
-			setMenuButtonClickListener: function(listener) {
-				this.$.menuButton.setMenuButtonClickListener(listener);
+			properties: {
+				path: {
+					type: String,
+					observer: 'pathChanged',
+				},
 			},
+
+			pathChanged: function() {
+				if ('/' === this.path) {
+					this.$.appIcon.hidden = false;
+					this.$.backIcon.hidden = true;
+				} else {
+					this.$.appIcon.hidden = true;
+					this.$.backIcon.hidden = false;
+				}
+			},
+
+			backIconTapped: function() {
+				window.history.back();
+			},
+
+			appIconTapped: function() {},
 		});
 	</script>
 </dom-module>

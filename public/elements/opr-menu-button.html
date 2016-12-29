@@ -12,6 +12,8 @@
 			}
 		</style>
 
+		<iron-location path="{{path}}"></iron-location>
+
 		<paper-menu-button>
 			<paper-icon-button icon="menu" class="dropdown-trigger" alt="menu"></paper-icon-button>
 			<paper-menu class="dropdown-content">
@@ -23,16 +25,12 @@
 		Polymer({
 			is: 'opr-menu-button',
 
-			listener: null,
-
-			setMenuButtonClickListener: function(listener) {
-				this.listener = listener;
+			properties: {
+				path: String,
 			},
 
 			openRandomSettings: function() {
-				if (this.listener) {
-					this.listener('random-settings');
-				}
+				this.path = '/random-settings';
 			},
 		});
 	</script>

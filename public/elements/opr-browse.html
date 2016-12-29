@@ -1,0 +1,126 @@
+<dom-module id="opr-browse">
+	<template>
+		<style>
+			#browseList {
+				background-color: var(--paper-blue-grey-200);
+				margin: 10px;
+				border-radius: 10px;
+				padding: 10px;
+			}
+
+			.entry {
+				background-color: var(--paper-blue-grey-100);
+				padding-left: 5px;
+				padding-right: 5px;
+				margin: 0;
+			}
+		</style>
+		<iron-location path="{{path}}"></iron-location>
+
+		<iron-ajax
+			id="browseAjax"
+			url="/browse-server"
+			handle-as="json"
+			method="POST"
+			content-type="application/json"
+			last-response="{{folderContents}}">
+		</iron-ajax>
+
+		<iron-list>
+			<template is="dom-repeat" items="[[breadcrumbs]]">
+				/ [[item]]
+			</template>
+
+			<div id="browseList">
+				<template is="dom-if" if="[[breadcrumbs.length]]">
+					<div class="entry" on-tap="onBackTap">
+						<iron-icon icon="icons:reply"></iron-icon>
+						<span class="name">Back</span>
+					</div>
+				</template>
+
+				<template is="dom-repeat" items="[[folderContents.data]]">
+					<div class="entry" on-tap="onTap" file="[[item]]">
+						<iron-icon icon="[[getIcon(item)]]"></iron-icon>
+
+						<span class="name">[[item.name]]</span>
+					</div>
+				</template>
+			</div>
+		</iron-list>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-browse',
+
+			properties: {
+				path: {
+					type: String,
+					observer: 'pathChanged',
+				},
+				breadcrumbs: {
+					type: Array,
+					value: [],
+				},
+			},
+
+			sendRequest: function(dir) {
+				this.setBreadcrumbs(dir);
+				this.$.browseAjax.body = JSON.stringify({
+					dir: dir,
+				});
+				this.$.browseAjax.generateRequest();
+			},
+
+			pathChanged: function() {
+				if ('/browse' === this.path) {
+					this.sendRequest('/');
+				}
+			},
+
+			getIcon: function(item) {
+				if (item.isDir) {
+					return 'icons:folder';
+				} else if (item.isPlayable) {
+					return 'icons:settings-overscan';
+				}
+
+				return 'icons:clear';
+			},
+
+			onTap: function(event) {
+				const file = event.currentTarget.file;
+
+				if (file.isDir) {
+					this.sendRequest(file.fullPath);
+				}
+			},
+
+			onBackTap: function() {
+				this.breadcrumbs.pop();
+
+				const joinedBreadcrumbs = this.breadcrumbs.join('/'),
+					dir = `/${joinedBreadcrumbs}`;
+
+				this.sendRequest(dir);
+			},
+
+			setBreadcrumbs: function(fullPath) {
+				const parts = fullPath.split('/');
+				let breadcrumbs = [];
+
+				for (let i = 0; i < parts.length; i++) {
+					const part = parts[i];
+
+					if ('' === part) {
+						continue;
+					}
+
+					breadcrumbs.push(part);
+				}
+
+				this.breadcrumbs = breadcrumbs;
+			},
+		});
+	</script>
+</dom-module>

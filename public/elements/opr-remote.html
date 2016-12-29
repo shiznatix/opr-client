@@ -11,6 +11,8 @@
 			}
 		</style>
 
+		<iron-location path="{{path}}"></iron-location>
+
 		<iron-ajax
 			id="commandAjax"
 			handle-as="json"
@@ -42,7 +44,7 @@
 		</div>
 
 		<div class="container flex-horizontal">
-			<paper-button raised>Browse</paper-button>
+			<paper-button raised on-tap="onTap" id="browse">Browse</paper-button>
 		</div>
 
 		<opr-random-dialog id="randomDialogElement"></opr-random-dialog>
@@ -54,12 +56,16 @@
 		Polymer({
 			is: 'opr-remote',
 
+			properties: {
+				path: String,
+			},
+
 			sendCommand: function(url, method, body) {
-				commandAjax.url = `/${url}`;
-				commandAjax.body = (body ? JSON.stringify(body) : null);
-				commandAjax.method = method;
-				commandAjax.contentType = ('POST' === method ? 'application/json' : null);
-				commandAjax.generateRequest();
+				this.$.commandAjax.url = `/${url}`;
+				this.$.commandAjax.body = (body ? JSON.stringify(body) : null);
+				this.$.commandAjax.method = method;
+				this.$.commandAjax.contentType = ('POST' === method ? 'application/json' : null);
+				this.$.commandAjax.generateRequest();
 			},
 
 			onTap: function(e) {
@@ -79,6 +85,8 @@
 							position: playPosition,
 						});
 					});
+				} else if ('browse' === id) {
+					this.path = '/browse';
 				}
 			},
 

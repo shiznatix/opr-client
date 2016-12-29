@@ -7,72 +7,21 @@
 
 		<iron-location path="{{path}}"></iron-location>
 
-		<opr-toolbar id="toolbar">
-			<iron-icon icon="arrow-back" id="backIcon" on-tap="backIconTapped"></iron-icon>
-			<iron-icon icon="weekend" id="appIcon" on-tap="appIconTapped"></iron-icon>
-		</opr-toolbar>
+		<opr-toolbar id="toolbar"></opr-toolbar>
 
 		<iron-pages
 			selected="[[path]]"
 			attr-for-selected="name"
 			role="main">
 
-			<opr-remote name="/"></opr-remote>
-			<opr-random-settings name="/random-settings"></opr-random-settings>
+			<opr-remote name="/" id="remotePage"></opr-remote>
+			<opr-random-settings name="/random-settings" id="randomSettingsPage"></opr-random-settings>
+			<opr-browse name="/browse" id="browsePage"></opr-browse>
 		</iron-pages>
 	</template>
 	<script>
 		Polymer({
 			is: 'opr-app',
-
-			properties: {
-				path: {
-					type: String,
-					observer: 'locationChanged',
-				},
-			},
-
-			locationChanged: function() {
-				this.setAppIcon(this.pathToTag());
-			},
-
-			ready: function() {
-				this.setAppIcon(this.pathToTag());
-
-				this.$.toolbar.setMenuButtonClickListener((buttonTag) => {
-					if ('remote' === buttonTag) {
-						this.path = '/';
-					} else {
-						this.path = `/${buttonTag}`;
-					}
-
-					this.setAppIcon(buttonTag);
-				});
-			},
-
-			pathToTag: function() {
-				if ('/random-settings' === this.path) {
-					return 'random-settings';
-				}
-
-				return 'remote';
-			},
-
-			setAppIcon: function(tag) {
-				if ('remote' === tag) {
-					this.$.appIcon.hidden = false;
-					this.$.backIcon.hidden = true;
-				} else if ('random-settings' === tag) {
-					this.$.appIcon.hidden = true;
-					this.$.backIcon.hidden = false;
-				}
-			},
-
-			backIconTapped: function() {
-				window.history.back();
-			},
-
-			appIconTapped: function() {},
 		});
 	</script>
 </dom-module>

@@ -21,6 +21,8 @@
 			}
 		</style>
 
+		<iron-location path="{{path}}"></iron-location>
+
 		<iron-ajax
 			id="randomSettingsAjax"
 			url="/shows"
@@ -50,8 +52,17 @@
 
 			savedShowNames: [],
 
-			attached: function() {
-				this.$.randomSettingsAjax.generateRequest();
+			properties: {
+				path: {
+					type: String,
+					observer: 'pathChanged',
+				},
+			},
+
+			pathChanged: function() {
+				if ('/random-settings' === this.path) {
+					this.reload();
+				}
 			},
 
 			ready: function() {
@@ -61,6 +72,10 @@
 				}
 
 				this.savedShowNames = (Array.isArray(this.savedShowNames) ? this.savedShowNames : []);
+			},
+
+			reload: function() {
+				this.$.randomSettingsAjax.generateRequest();
 			},
 
 			checkboxChecked: function(showName) {

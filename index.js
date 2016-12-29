@@ -5,6 +5,7 @@ const currentDir = __dirname,
 	player = require(`${currentDir}/lib/player.js`),
 	playlist = require(`${currentDir}/lib/playlist.js`),
 	server = require(`${currentDir}/lib/server.js`),
+	browse = require(`${currentDir}/lib/browse.js`),
 	validator = require(`${currentDir}/lib/validator.js`),
 	logger = require(`${currentDir}/lib/logger.js`),
 	_ = require('lodash'),
@@ -43,6 +44,9 @@ app.use(bodyParser.urlencoded({
 // Public files
 app.use(express.static(`${__dirname}/public`));
 app.get('/random-settings', (request, response) => {
+	response.sendFile(`${__dirname}/public/index.html`);
+});
+app.get('/browse', (request, response) => {
 	response.sendFile(`${__dirname}/public/index.html`);
 });
 
@@ -147,8 +151,10 @@ app.post('/random', (request, response) => {
 		logger.error(error);
 	});
 });
-app.post('/browse', (request, response) => {
-	server.browse(request.body.path).then((data) => {
+app.post('/browse-server', (request, response) => {
+	validator.browse(request.body).then((params) => {
+		return browse.getFiles(params.dir);
+	}).then((data) => {
 		successResponse(response, data);
 	}).catch((error) => {
 		logger.error(error);
@@ -167,7 +173,7 @@ app.get('/shows', (request, response) => {
 // Not found handler
 app.get('*', (request, response) => {
 	response.status(404).json({
-		'success': true,
+		'success': false,
 		'data': null,
 	});
 });
