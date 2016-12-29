@@ -8,11 +8,23 @@
 				padding: 10px;
 			}
 
+			#browseBreadcrumbs {
+				margin: 5px;
+			}
+
 			.entry {
 				background-color: var(--paper-blue-grey-100);
 				padding-left: 5px;
 				padding-right: 5px;
 				margin: 0;
+				font-size: 1.2em;
+				border: 1px solid black;
+			}
+
+			#backEntry {
+				background-color: var(--paper-blue-grey-50);
+				padding-top: 10px;
+				padding-bottom: 10px;
 			}
 		</style>
 		<iron-location path="{{path}}"></iron-location>
@@ -23,17 +35,22 @@
 			handle-as="json"
 			method="POST"
 			content-type="application/json"
+			on-response="handleResponse"
 			last-response="{{folderContents}}">
 		</iron-ajax>
 
 		<iron-list>
-			<template is="dom-repeat" items="[[breadcrumbs]]">
-				/ [[item]]
-			</template>
-
 			<div id="browseList">
+				<div id="browseBreadcrumbs">
+					<paper-button raised on-tap="onBreadcrumTapped">/</paper-button>
+
+					<template is="dom-repeat" items="[[breadcrumbs]]">
+						<paper-button raised on-tap="onBreadcrumTapped" item="[[item]]">[[item.dir]]</paper-button>
+					</template>
+				</div>
+
 				<template is="dom-if" if="[[breadcrumbs.length]]">
-					<div class="entry" on-tap="onBackTap">
+					<div class="entry" on-tap="onBackTap" id="backEntry">
 						<iron-icon icon="icons:reply"></iron-icon>
 						<span class="name">Back</span>
 					</div>
@@ -64,8 +81,11 @@
 				},
 			},
 
+			attemptedFullPath: '/',
+			currentFullPath: '/',
+
 			sendRequest: function(dir) {
-				this.setBreadcrumbs(dir);
+				this.attemptedFullPath = dir;
 				this.$.browseAjax.body = JSON.stringify({
 					dir: dir,
 				});
@@ -74,7 +94,9 @@
 
 			pathChanged: function() {
 				if ('/browse' === this.path) {
-					this.sendRequest('/');
+					const latestBrowseFullPath = localStorage.getItem('latestBrowseFullPath');
+
+					this.sendRequest((latestBrowseFullPath ? latestBrowseFullPath : '/'));
 				}
 			},
 
@@ -99,15 +121,30 @@
 			onBackTap: function() {
 				this.breadcrumbs.pop();
 
-				const joinedBreadcrumbs = this.breadcrumbs.join('/'),
-					dir = `/${joinedBreadcrumbs}`;
+				let dir;
+
+				if (0 === this.breadcrumbs.length) {
+					dir = '/';
+				} else {
+					dir = this.breadcrumbs[this.breadcrumbs.length - 1].fullPath;
+				}
 
 				this.sendRequest(dir);
 			},
 
+			onBreadcrumTapped: function(event) {
+				const item = event.target.item,
+					fullPath = (item ? item.fullPath : '/');
+
+				// even if its the same as the current full path, do it.
+				// its a good way to be able to refresh via button
+				this.sendRequest(fullPath);
+			},
+
 			setBreadcrumbs: function(fullPath) {
 				const parts = fullPath.split('/');
-				let breadcrumbs = [];
+				let breadcrumbs = [],
+					currentFullPath = '/';
 
 				for (let i = 0; i < parts.length; i++) {
 					const part = parts[i];
@@ -116,10 +153,21 @@
 						continue;
 					}
 
-					breadcrumbs.push(part);
+					currentFullPath = `${currentFullPath}/${part}`;
+
+					breadcrumbs.push({
+						dir: part,
+						fullPath: currentFullPath,
+					});
 				}
 
 				this.breadcrumbs = breadcrumbs;
+			},
+
+			handleResponse: function() {
+				this.currentFullPath = this.attemptedFullPath;
+				localStorage.setItem('latestBrowseFullPath', this.currentFullPath);
+				this.setBreadcrumbs(this.currentFullPath);
 			},
 		});
 	</script>
