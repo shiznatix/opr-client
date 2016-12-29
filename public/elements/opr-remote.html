@@ -3,7 +3,7 @@
 		<style>
 			paper-button {
 				width: 100%;
-				background-color: #e8e8e8;
+				background-color: var(--paper-blue-grey-50);
 			}
 			.flex-horizontal {
 				@apply(--layout-horizontal);
@@ -56,9 +56,9 @@
 
 			sendCommand: function(url, method, body) {
 				commandAjax.url = `/${url}`;
-				commandAjax.body = body;
+				commandAjax.body = (body ? JSON.stringify(body) : null);
 				commandAjax.method = method;
-				commandAjax.contentType = ('POST' === method ? 'application/x-www-form-urlencoded' : null);
+				commandAjax.contentType = ('POST' === method ? 'application/json' : null);
 				commandAjax.generateRequest();
 			},
 
@@ -66,11 +66,11 @@
 				const id = e.target.getAttribute('id');
 
 				if ('random' === id) {
-					this.$.randomDialogElement.open((method, amount) => {
+					this.$.randomDialogElement.open((method, amount, showNames) => {
 						this.sendCommand('random', 'POST', {
 							method: method,
 							amount: amount,
-							showNames: [],
+							showNames: showNames,
 						});
 					});
 				} else if ('play-file' === id) {

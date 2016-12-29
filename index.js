@@ -41,7 +41,10 @@ app.use(bodyParser.urlencoded({
 }));
 
 // Public files
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(`${__dirname}/public`));
+app.get('/random-settings', (request, response) => {
+	response.sendFile(`${__dirname}/public/index.html`);
+});
 
 // API player routes
 app.get('/close-player', (request, response) => {

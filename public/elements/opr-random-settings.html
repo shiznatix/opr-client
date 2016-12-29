@@ -1,9 +1,23 @@
 <dom-module id="opr-random-settings">
 	<template>
 		<style>
-			.flex-horizontal {
-				@apply(--layout-horizontal);
-				margin-top: 10px;
+			iron-accordion {
+				background-color: var(--paper-blue-grey-200);
+				margin: 10px;
+				padding-left: 5px;
+				padding-right: 5px;
+				padding-bottom: 5px;
+				border-radius: 10px;
+			}
+
+			paper-checkbox {
+				width: 100%;
+				margin: 5px;
+			}
+
+			.checkboxGroup {
+				background-color: var(--paper-blue-grey-100);
+				border-radius: 10px;
 			}
 		</style>
 
@@ -11,18 +25,21 @@
 			id="randomSettingsAjax"
 			url="/shows"
 			handle-as="json"
-			last-response="{{ajaxResponse}}"
-			on-response="handleResponse">
+			last-response="{{ajaxResponse}}">
 		</iron-ajax>
 
-		<iron-accordions>
+		<iron-accordions id="showCategoryAccordions">
 			<template is="dom-repeat" items="[[ajaxResponse.data]]">
 				<iron-accordion>
 					<h2 header>[[item.categoryName]]</h2>
 
-					<template is="dom-repeat" items="[[item.shows]]">
-						<p>[[item]]</p>
-					</template>
+					<div class="checkboxGroup">
+						<template is="dom-repeat" items="[[item.shows]]">
+							<div>
+								<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="{{checkboxChecked(item)}}">[[item]]</paper-checkbox>
+							</div>
+						</template>
+					</div>
 				</iron-accordion>
 			</template>
 		</iron-accordions>
@@ -31,12 +48,37 @@
 		Polymer({
 			is: 'opr-random-settings',
 
+			savedShowNames: [],
+
 			attached: function() {
 				this.$.randomSettingsAjax.generateRequest();
 			},
 
-			handleResponse: function(response) {
-				console.log(response);
+			ready: function() {
+				try {
+					this.savedShowNames = JSON.parse(localStorage.getItem('randomShows'));
+				} catch (e) {
+				}
+
+				this.savedShowNames = (Array.isArray(this.savedShowNames) ? this.savedShowNames : []);
+			},
+
+			checkboxChecked: function(showName) {
+				return (this.savedShowNames.indexOf(showName) > -1 ? 'checked' : '');
+			},
+
+			checkboxChanged: function(event) {
+				const showName = event.target.value,
+					checked = event.target.checked,
+					index = this.savedShowNames.indexOf(showName);
+
+				if (!checked && index > -1) {
+					this.savedShowNames.splice(index, 1);
+					localStorage.setItem('randomShows', JSON.stringify(this.savedShowNames));
+				} else if (checked && -1 === index) {
+					this.savedShowNames.push(showName);
+					localStorage.setItem('randomShows', JSON.stringify(this.savedShowNames));
+				}
 			},
 		});
 	</script>

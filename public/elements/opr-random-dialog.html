@@ -45,12 +45,23 @@
 				this.$.randomDialog.open();
 			},
 
+			getSavedShowNames: function() {
+				let savedShowNames = [];
+
+				try {
+					savedShowNames = JSON.parse(localStorage.getItem('randomShows'));
+				} catch (e) {
+				}
+
+				return (Array.isArray(savedShowNames) ? savedShowNames : []);
+			},
+
 			enqueuePressed: function() {
-				this.randomCallback('enqueue', this.amount);
+				this.randomCallback('enqueue', this.amount, this.getSavedShowNames());
 			},
 
 			playPressed: function() {
-				this.randomCallback('play', this.amount);
+				this.randomCallback('play', this.amount, this.getSavedShowNames());
 			},
 		});
 	</script>

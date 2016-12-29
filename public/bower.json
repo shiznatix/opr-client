@@ -34,6 +34,8 @@
     "paper-toast": "^1.3.0",
     "paper-spinner": "^1.2.1",
     "iron-pages": "^1.0.8",
-    "iron-accordions": "^1.1.0"
+    "iron-accordions": "^1.1.0",
+    "paper-checkbox": "^1.4.2",
+    "iron-location": "^0.8.9"
   }
 }

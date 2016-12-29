@@ -2,16 +2,23 @@
 
 <dom-module id="opr-app">
 	<template>
-		<style include="opr-shared-styles"></style>
-		<opr-toolbar id="toolbar"></opr-toolbar>
+		<style include="opr-shared-styles">
+		</style>
+
+		<iron-location path="{{path}}"></iron-location>
+
+		<opr-toolbar id="toolbar">
+			<iron-icon icon="arrow-back" id="backIcon" on-tap="backIconTapped"></iron-icon>
+			<iron-icon icon="weekend" id="appIcon" on-tap="appIconTapped"></iron-icon>
+		</opr-toolbar>
 
 		<iron-pages
-			selected="[[page]]"
+			selected="[[path]]"
 			attr-for-selected="name"
 			role="main">
 
-			<opr-remote name="remote"></opr-remote>
-			<opr-random-settings name="random-settings"></opr-random-settings>
+			<opr-remote name="/"></opr-remote>
+			<opr-random-settings name="/random-settings"></opr-random-settings>
 		</iron-pages>
 	</template>
 	<script>
@@ -19,17 +26,53 @@
 			is: 'opr-app',
 
 			properties: {
-				page: {
+				path: {
 					type: String,
-					value: 'remote',
+					observer: 'locationChanged',
 				},
 			},
 
+			locationChanged: function() {
+				this.setAppIcon(this.pathToTag());
+			},
+
 			ready: function() {
+				this.setAppIcon(this.pathToTag());
+
 				this.$.toolbar.setMenuButtonClickListener((buttonTag) => {
-					this.page = buttonTag;
+					if ('remote' === buttonTag) {
+						this.path = '/';
+					} else {
+						this.path = `/${buttonTag}`;
+					}
+
+					this.setAppIcon(buttonTag);
 				});
 			},
+
+			pathToTag: function() {
+				if ('/random-settings' === this.path) {
+					return 'random-settings';
+				}
+
+				return 'remote';
+			},
+
+			setAppIcon: function(tag) {
+				if ('remote' === tag) {
+					this.$.appIcon.hidden = false;
+					this.$.backIcon.hidden = true;
+				} else if ('random-settings' === tag) {
+					this.$.appIcon.hidden = true;
+					this.$.backIcon.hidden = false;
+				}
+			},
+
+			backIconTapped: function() {
+				window.history.back();
+			},
+
+			appIconTapped: function() {},
 		});
 	</script>
 </dom-module>
