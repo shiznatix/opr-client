@@ -1,0 +1,34 @@
+<dom-module id="opr-toast">
+	<template>
+		<style include="opr-shared-styles">
+		</style>
+
+		<paper-toast id="toast"></paper-toast>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-toast',
+
+			toastFromPlaylistEvent: function(e) {
+				const response = e.detail.response;
+
+				if (!response.success) {
+					this.$.toast.text = response.error;
+				} else {
+					const data = (Array.isArray(response.data) ? response.data : [response.data]);
+					let toastMessages = [];
+
+					for (let i = 0; i < data.length; i++) {
+						const show = data[i];
+
+						toastMessages.push(show.fileName);
+					}
+
+					this.$.toast.text = toastMessages;
+				}
+
+				this.$.toast.open();
+			},
+		});
+	</script>
+</dom-module>

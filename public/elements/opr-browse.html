@@ -1,8 +1,8 @@
 <dom-module id="opr-browse">
 	<template>
-		<style>
+		<style include="opr-shared-styles">
 			#browseList {
-				background-color: var(--paper-blue-grey-200);
+				background-color: var(--paper-blue-grey-700);
 				margin: 10px;
 				border-radius: 10px;
 				padding: 10px;
@@ -12,21 +12,24 @@
 				margin: 5px;
 			}
 
-			.entry {
-				background-color: var(--paper-blue-grey-100);
-				padding-left: 5px;
-				padding-right: 5px;
-				margin: 0;
-				font-size: 1.2em;
-				border: 1px solid black;
-			}
-
 			#backEntry {
-				background-color: var(--paper-blue-grey-50);
+				background-color: var(--paper-blue-grey-500);
 				padding-top: 10px;
 				padding-bottom: 10px;
+				cursor: pointer;
+			}
+
+			#playEuqueueButtons {
+				width: 100%;
+				margin-top: 5px;
+			}
+
+			.playEuqueueButton {
+				width: 33%;
+				margin: 0;
 			}
 		</style>
+
 		<iron-location path="{{path}}"></iron-location>
 
 		<iron-ajax
@@ -38,33 +41,56 @@
 			on-response="handleResponse"
 			last-response="{{folderContents}}">
 		</iron-ajax>
+		<iron-ajax
+			id="playEuqueueAjax"
+			handle-as="json"
+			method="POST"
+			content-type="application/json"
+			on-response="playEnqueueResponse">
+		</iron-ajax>
 
 		<iron-list>
+			<div id="browseBreadcrumbs">
+				<paper-button raised on-tap="onBreadcrumTapped">/</paper-button>
+
+				<template is="dom-repeat" items="[[breadcrumbs]]">
+					<paper-button raised on-tap="onBreadcrumTapped" item="[[item]]">[[item.dir]]</paper-button>
+				</template>
+			</div>
+
 			<div id="browseList">
-				<div id="browseBreadcrumbs">
-					<paper-button raised on-tap="onBreadcrumTapped">/</paper-button>
-
-					<template is="dom-repeat" items="[[breadcrumbs]]">
-						<paper-button raised on-tap="onBreadcrumTapped" item="[[item]]">[[item.dir]]</paper-button>
-					</template>
-				</div>
-
 				<template is="dom-if" if="[[breadcrumbs.length]]">
-					<div class="entry" on-tap="onBackTap" id="backEntry">
+					<div on-tap="onBackTap" id="backEntry">
 						<iron-icon icon="icons:reply"></iron-icon>
-						<span class="name">Back</span>
+						<span class="text">Back</span>
 					</div>
 				</template>
 
 				<template is="dom-repeat" items="[[folderContents.data]]">
-					<div class="entry" on-tap="onTap" file="[[item]]">
-						<iron-icon icon="[[getIcon(item)]]"></iron-icon>
-
-						<span class="name">[[item.name]]</span>
+					<div on-tap="onTap" file="[[item]]">
+						<template is="dom-if" if="[[item.isPlayable]]">
+							<paper-checkbox value="[[item.fullPath]]" on-change="checkboxChanged">
+								<span class="text">[[item.name]]</span>
+							</paper-checkbox>
+						</template>
+						<template is="dom-if" if="[[!item.isPlayable]]">
+							<iron-icon icon="[[getIcon(item)]]"></iron-icon>
+							<span class="text">[[item.name]]</span>
+						</template>
 					</div>
 				</template>
+
+				<div id="playEuqueueButtons">
+					<paper-button raised on-tap="enqueueSelected" class="playEuqueueButton" id="browseEnqueueButton" disabled>Enqueue</paper-button>
+					<paper-button raised on-tap="insertAtSelected" class="playEuqueueButton" id="browseInsertAtButton" disabled>Insert at</paper-button>
+					<paper-button raised on-tap="playSelected" class="playEuqueueButton" id="browsePlayButton" disabled>Play</paper-button>
+				</div>
 			</div>
 		</iron-list>
+
+		<opr-insert-at-dialog id="insertAtDialogElement"></opr-insert-at-dialog>
+
+		<opr-toast id="browseToast"></opr-toast>
 	</template>
 	<script>
 		Polymer({
@@ -83,6 +109,7 @@
 
 			attemptedFullPath: '/',
 			currentFullPath: '/',
+			selectedFiles: [],
 
 			sendRequest: function(dir) {
 				this.attemptedFullPath = dir;
@@ -103,8 +130,6 @@
 			getIcon: function(item) {
 				if (item.isDir) {
 					return 'icons:folder';
-				} else if (item.isPlayable) {
-					return 'icons:settings-overscan';
 				}
 
 				return 'icons:clear';
@@ -153,7 +178,7 @@
 						continue;
 					}
 
-					currentFullPath = `${currentFullPath}/${part}`;
+					currentFullPath = ('/' === currentFullPath ? `/${part}` : `${currentFullPath}/${part}`),
 
 					breadcrumbs.push({
 						dir: part,
@@ -166,8 +191,66 @@
 
 			handleResponse: function() {
 				this.currentFullPath = this.attemptedFullPath;
+				this.selectedFiles = [];
+				this.setBrowseButtonsDisabled(true);
 				localStorage.setItem('latestBrowseFullPath', this.currentFullPath);
 				this.setBreadcrumbs(this.currentFullPath);
+			},
+
+			checkboxChanged: function(event) {
+				const target = event.target,
+					index = this.selectedFiles.indexOf(target.value);
+
+				if (target.checked) {
+					this.selectedFiles.push(target.value);
+				} else if (index > -1) {
+					this.selectedFiles.splice(index, 1);
+				}
+
+				this.setBrowseButtonsDisabled((0 === this.selectedFiles.length));
+			},
+
+			setBrowseButtonsDisabled: function(disabled) {
+				this.$.browseEnqueueButton.disabled = disabled;
+				this.$.browseInsertAtButton.disabled = disabled;
+				this.$.browsePlayButton.disabled = disabled;
+			},
+
+			enqueueSelected: function() {
+				this.$.playEuqueueAjax.url = '/enqueue-playlist';
+				this.$.playEuqueueAjax.body = JSON.stringify({
+					filePaths: this.selectedFiles,
+				});
+				this.$.playEuqueueAjax.generateRequest();
+			},
+
+			insertAtSelected: function() {
+				this.$.insertAtDialogElement.open((atIndex) => {
+					this.$.playEuqueueAjax.url = '/set-at-playlist';
+					this.$.playEuqueueAjax.body = JSON.stringify({
+						atIndex: atIndex,
+						filePaths: this.selectedFiles,
+					});
+					this.$.playEuqueueAjax.generateRequest();
+				});
+			},
+
+			playSelected: function() {
+				this.$.playEuqueueAjax.url = '/set-playlist';
+				this.$.playEuqueueAjax.body = JSON.stringify({
+					filePaths: this.selectedFiles,
+				});
+				this.$.playEuqueueAjax.generateRequest();
+			},
+
+			playEnqueueResponse: function(e) {
+				let paperCheckboxes = this.querySelectorAll('paper-checkbox');
+				this.selectedFiles = [];
+
+				for (let i = 0; i < paperCheckboxes.length; i++) {
+					paperCheckboxes[i].checked = false;
+				}
+				this.$.browseToast.toastFromPlaylistEvent(e);
 			},
 		});
 	</script>

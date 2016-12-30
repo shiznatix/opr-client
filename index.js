@@ -91,6 +91,44 @@ app.get('/current-playlist', (request, response) => {
 		errorResponse(response, error);
 	});
 });
+app.post('/set-playlist', (request, response) => {
+	validator.setPlaylist(request.body).then((params) => {
+		return playlist.set(params.filePaths).then(() => {
+			return playlist.playAt(0);
+		}).then(() => {
+			return playlist.get();
+		});
+	}).then((data) => {
+		successResponse(response, data);
+	}).catch((error) => {
+		logger.error(error);
+		errorResponse(response, error);
+	});
+});
+app.post('/enqueue-playlist', (request, response) => {
+	validator.setPlaylist(request.body).then((params) => {
+		return playlist.enqueue(params.filePaths).then(() => {
+			return playlist.get();
+		});
+	}).then((data) => {
+		successResponse(response, data);
+	}).catch((error) => {
+		logger.error(error);
+		errorResponse(response, error);
+	});
+});
+app.post('/set-at-playlist', (request, response) => {
+	validator.setAtPlaylist(request.body).then((params) => {
+		return playlist.setAt(params.filePaths, params.atIndex).then(() => {
+			return playlist.get();
+		});
+	}).then((data) => {
+		successResponse(response, data);
+	}).catch((error) => {
+		logger.error(error);
+		errorResponse(response, error);
+	});
+});
 app.get('/previous', (request, response) => {
 	playlist.previous().then((data) => {
 		successResponse(response, data);
@@ -108,7 +146,9 @@ app.get('/next', (request, response) => {
 	});
 });
 app.post('/play-at', (request, response) => {
-	playlist.playAt(request.body.position).then((data) => {
+	validator.playAt(request.body).then((params) => {
+		return playlist.playAt(params.index);
+	}).then((data) => {
 		successResponse(response, data);
 	}).catch((error) => {
 		logger.error(error);
@@ -125,30 +165,26 @@ app.post('/random', (request, response) => {
 
 		return server.random(params.showNames, params.amount);
 	}).then((data) => {
-		let responseData = [];
+		let filePaths = [];
 
 		_.forEach(data, (show) => {
-			responseData.push(`${show.showName} - ${show.episodeName}`);
+			filePaths.push(show.path);
 		});
 
-		// respond as soon as possible
-		successResponse(response, responseData);
-
-		return data;
-	}).catch((error) => {
-		errorResponse(response, error);
-
-		throw error;
-	}).then((data) => {
 		if ('enqueue' === params.method) {
-			playlist.enqueue(data);
+			return playlist.enqueue(filePaths);
 		} else {
-			playlist.set(data).then(() => {
-				playlist.playAt(0);
+			return playlist.set(filePaths).then(() => {
+				return playlist.playAt(0);
 			});
 		}
+	}).then(() => {
+		return playlist.get();
+	}).then((data) => {
+		successResponse(response, data);
 	}).catch((error) => {
 		logger.error(error);
+		errorResponse(response, error);
 	});
 });
 app.post('/browse-server', (request, response) => {
@@ -179,6 +215,8 @@ app.get('*', (request, response) => {
 });
 
 // Start web server
-app.listen(config.port, () => {
-	console.log('Started server (plain text) on port ' + config.port);
+playlist.setPlaylistFromFile().finally(() => {
+	app.listen(config.port, () => {
+		console.log('Started server (plain text) on port ' + config.port);
+	});
 });

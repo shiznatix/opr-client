@@ -3,11 +3,59 @@
 		<style>
 			:host {
 				display: block;
-				background-color: #ffffff;
+				background-color: var(--paper-blue-grey-900);
 				height: 100vh;
 			}
 
 			@media (min-width: 640px) {
+			}
+
+			paper-dialog {
+				background-color: var(--paper-blue-grey-900);
+				color: var(--paper-blue-grey-200);
+			}
+
+			paper-radio-button {
+				--paper-radio-button-label-color: var(--paper-blue-grey-200);
+				--paper-radio-button-unchecked-background-color: var(--paper-blue-grey-800);
+				--paper-radio-button-unchecked-color: var(--paper-blue-grey-700);
+				--paper-radio-button-checked-color: var(--paper-blue-grey-200);
+			}
+
+			paper-button {
+				background-color: var(--paper-blue-grey-800);
+				color: var(--paper-blue-grey-200);
+				font-weight: bold;
+			}
+
+			iron-accordion {
+				background-color: var(--paper-blue-grey-800);
+				margin: 10px;
+				padding-left: 5px;
+				padding-right: 5px;
+				padding-bottom: 5px;
+				border-radius: 10px;
+			}
+
+			paper-checkbox {
+				width: 100%;
+				margin: 5px;
+				padding: 5px;
+				margin: 0;
+				font-size: 1.2em;
+				border: 1px solid black;
+				--paper-checkbox-label-color: var(--paper-blue-grey-200);
+				--paper-checkbox-unchecked-background-color: var(--paper-blue-grey-800);
+				--paper-checkbox-unchecked-color: var(--paper-blue-grey-700);
+				--paper-checkbox-checked-color: var(--paper-blue-grey-200);
+			}
+
+			h2 {
+				color: var(--paper-blue-grey-200);
+			}
+
+			.text {
+				color: var(--paper-blue-grey-200);
 			}
 		</style>
 	</template>

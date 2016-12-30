@@ -1,4 +1,4 @@
-<dom-module id="opr-play-file-dialog">
+<dom-module id="opr-insert-at-dialog">
 	<template>
 		<style include="opr-shared-styles"></style>
 
@@ -13,66 +13,64 @@
 		<paper-dialog
 			entry-animation="scale-up-animation"
 			exit-animation="fade-out-animation"
-			id="playFileDialog">
+			id="insertAtDialog">
 
-			<h2>Play file</h2>
-
-			<paper-spinner active id="playFileLoadingSpinner"></paper-spinner>
+			<h2>Insert at</h2>
 
 			<paper-radio-group on-change="indexOnChange" id="indexRadio" attr-for-selected="value">
 				<template is="dom-repeat" items="[[ajaxResponse.data]]">
 					<paper-radio-button value="[[index]]">[[item.fileName]]</paper-radio-button>
 					<br />
 				</template>
+
+				<paper-radio-button value="-1">--Enqueue--</paper-radio-button>
 			</paper-radio-group>
 
 			<div class="buttons">
 				<paper-button dialog-dismiss>Cancel</paper-button>
-				<paper-button dialog-confirm disabled id="playButton" on-tap="playPressed">Play</paper-button>
+				<paper-button dialog-confirm disabled id="insertAtButton" on-tap="insertAtPressed">Insert at</paper-button>
 			</div>
 		</paper-dialog>
 	</template>
 	<script>
 		Polymer({
-			is: 'opr-play-file-dialog',
+			is: 'opr-insert-at-dialog',
 
 			selectedIndex: -1,
-			playIndexCallback: null,
+			insertAtCallback: null,
 
 			clearSelectedIndex: function() {
 				this.$.indexRadio.select(-1);
 				this.selectedIndex = -1;
-				this.$.playButton.disabled = true;
+				this.$.insertAtButton.disabled = true;
 			},
 
-			open: function(playIndexCallback) {
-				this.playIndexCallback = playIndexCallback;
+			open: function(insertAtCallback) {
+				this.insertAtCallback = insertAtCallback;
 				this.clearSelectedIndex();
 				this.$.indexRadio.hidden = true;
-				this.$.playFileLoadingSpinner.hidden = false;
-				this.$.playFileDialog.open();
+				this.$.insertAtDialog.open();
 				this.$.currentPlaylistAjax.generateRequest();
 			},
 
 			handleResponse: function() {
 				this.clearSelectedIndex();
 				this.$.indexRadio.hidden = false;
-				this.$.playFileLoadingSpinner.hidden = true;
 			},
 
 			indexOnChange: function(e) {
 				const target = e.target;
 
 				this.selectedIndex = target.value;
-				this.$.playButton.disabled = false;
+				this.$.insertAtButton.disabled = false;
 			},
 
-			playPressed: function(e) {
-				if (this.selectedIndex < 1) {
-					return;
+			insertAtPressed: function(e) {
+				if (this.selectedIndex < 0) {
+					this.insertAtCallback(this.ajaxResponse.data.length);
+				} else {
+					this.insertAtCallback(this.selectedIndex);
 				}
-
-				this.playIndexCallback(this.selectedIndex);
 			},
 		});
 	</script>

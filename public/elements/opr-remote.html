@@ -1,9 +1,8 @@
 <dom-module id="opr-remote">
 	<template>
-		<style>
+		<style include="opr-shared-styles">
 			paper-button {
 				width: 100%;
-				background-color: var(--paper-blue-grey-50);
 			}
 			.flex-horizontal {
 				@apply(--layout-horizontal);
@@ -50,7 +49,7 @@
 		<opr-random-dialog id="randomDialogElement"></opr-random-dialog>
 		<opr-play-file-dialog id="playFileDialogElement"></opr-play-file-dialog>
 
-		<paper-toast id="toast"></paper-toast>
+		<opr-toast id="remoteToast"></opr-toast>
 	</template>
 	<script>
 		Polymer({
@@ -80,9 +79,9 @@
 						});
 					});
 				} else if ('play-file' === id) {
-					this.$.playFileDialogElement.open((playPosition) => {
+					this.$.playFileDialogElement.open((playIndex) => {
 						this.sendCommand('play-at', 'POST', {
-							position: playPosition,
+							index: playIndex,
 						});
 					});
 				} else if ('browse' === id) {
@@ -91,15 +90,7 @@
 			},
 
 			handleResponse: function(e) {
-				const response = e.detail.response;
-
-				if (!response.success) {
-					this.$.toast.text = response.error;
-				} else {
-					this.$.toast.text = response.data;
-				}
-
-				this.$.toast.open();
+				this.$.remoteToast.toastFromPlaylistEvent(e);
 			},
 		});
 	</script>
