@@ -1,12 +1,6 @@
 <dom-module id="opr-shared-styles">
 	<template>
 		<style>
-			:host {
-				display: block;
-				background-color: var(--paper-blue-grey-900);
-				height: 100vh;
-			}
-
 			@media (min-width: 640px) {
 			}
 
@@ -26,6 +20,7 @@
 				background-color: var(--paper-blue-grey-800);
 				color: var(--paper-blue-grey-200);
 				font-weight: bold;
+				font-size: 4vw;
 			}
 
 			iron-accordion {
@@ -37,17 +32,21 @@
 				border-radius: 10px;
 			}
 
+			iron-icon {
+				--iron-icon-fill-color: var(--paper-blue-grey-300);
+				--iron-icon-stroke-color: var(--paper-blue-grey-200);
+				--iron-icon-height: 8vw;
+				--iron-icon-width: 8vw;
+			}
+
 			paper-checkbox {
-				width: 100%;
-				margin: 5px;
-				padding: 5px;
-				margin: 0;
-				font-size: 1.2em;
-				border: 1px solid black;
 				--paper-checkbox-label-color: var(--paper-blue-grey-200);
-				--paper-checkbox-unchecked-background-color: var(--paper-blue-grey-800);
-				--paper-checkbox-unchecked-color: var(--paper-blue-grey-700);
+				--paper-checkbox-unchecked-background-color: var(--paper-blue-grey-300);
+				--paper-checkbox-unchecked-color: var(--paper-blue-grey-200);
 				--paper-checkbox-checked-color: var(--paper-blue-grey-200);
+				--paper-checkbox-label-spacing: 1vw;
+				--paper-checkbox-size: 7vw;
+				--paper-checkbox-margin: 1vw;
 			}
 
 			h2 {
@@ -56,6 +55,13 @@
 
 			.text {
 				color: var(--paper-blue-grey-200);
+			}
+
+			.roundedContainer {
+				background-color: var(--paper-blue-grey-700);
+				margin: 1vw;
+				border-radius: 2vw;
+				padding: 1vw;
 			}
 		</style>
 	</template>

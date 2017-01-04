@@ -2,25 +2,82 @@
 
 <dom-module id="opr-app">
 	<template>
-		<style include="opr-shared-styles"></style>
+		<style include="opr-shared-styles">
+			paper-scroll-header-panel {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				background-color: var(--paper-blue-grey-900);
+			}
+
+			paper-toolbar {
+				color: var(--paper-blue-200);
+				background-color: var(--paper-blue-900);
+			}
+
+			iron-icon {
+				--iron-icon-fill-color: var(--paper-blue-900);
+				--iron-icon-stroke-color: var(--paper-blue-200);
+				margin-right: 1vw;
+			}
+
+			#toolbarTitle {
+				font-size: 5vw;
+				flex-grow: 1;
+			}
+		</style>
 
 		<iron-location path="{{path}}"></iron-location>
 
-		<opr-toolbar id="toolbar"></opr-toolbar>
+		<paper-scroll-header-panel fixed>
+			<paper-toolbar>
+				<iron-icon icon="arrow-back" id="backIcon" on-tap="backIconTapped"></iron-icon>
+				<iron-icon icon="weekend" id="appIcon" on-tap="appIconTapped"></iron-icon>
+				<h1 id="toolbarTitle">OMX Remote</h1>
+				<opr-menu-button id="menuButton"></opr-menu-button>
+			</paper-toolbar>
 
-		<iron-pages
-			selected="[[path]]"
-			attr-for-selected="name"
-			role="main">
+			<div class="content">
+				<iron-pages
+					selected="[[path]]"
+					attr-for-selected="name"
+					role="main">
 
-			<opr-remote name="/" id="remotePage"></opr-remote>
-			<opr-random-settings name="/random-settings" id="randomSettingsPage"></opr-random-settings>
-			<opr-browse name="/browse" id="browsePage"></opr-browse>
-		</iron-pages>
+					<opr-remote name="/" id="remotePage"></opr-remote>
+					<opr-random-settings name="/random-settings" id="randomSettingsPage"></opr-random-settings>
+					<opr-browse name="/browse" id="browsePage"></opr-browse>
+				</iron-pages>
+			</div>
+		</paper-scroll-header-panel>
 	</template>
 	<script>
 		Polymer({
 			is: 'opr-app',
+
+			properties: {
+				path: {
+					type: String,
+					observer: 'pathChanged',
+				},
+			},
+
+			pathChanged: function() {
+				if ('/' === this.path) {
+					this.$.appIcon.hidden = false;
+					this.$.backIcon.hidden = true;
+				} else {
+					this.$.appIcon.hidden = true;
+					this.$.backIcon.hidden = false;
+				}
+			},
+
+			backIconTapped: function() {
+				window.history.back();
+			},
+
+			appIconTapped: function() {},
 		});
 	</script>
 </dom-module>

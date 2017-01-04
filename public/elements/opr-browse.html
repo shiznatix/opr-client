@@ -1,31 +1,49 @@
 <dom-module id="opr-browse">
 	<template>
 		<style include="opr-shared-styles">
-			#browseList {
-				background-color: var(--paper-blue-grey-700);
-				margin: 10px;
-				border-radius: 10px;
-				padding: 10px;
+			paper-checkbox {
+				width: 100%;
 			}
 
 			#browseBreadcrumbs {
 				margin: 5px;
 			}
+			.breadcrumb {
+				margin-right: 0;
+				margin-left: 0;
+				margin-bottom: 5px;
+				min-width: 0;
+				font-size: 3vw;
+			}
 
-			#backEntry {
-				background-color: var(--paper-blue-grey-500);
-				padding-top: 10px;
-				padding-bottom: 10px;
-				cursor: pointer;
+			iron-list {
+			}
+
+			.entry {
+				padding: 5px;
+				margin-bottom: 7px;
+				font-size: 7vw;
+				border-bottom: 1px solid var(--paper-blue-grey-900);
+			}
+			.entry:last-child {
+				border: 0;
+			}
+
+			.unclickable {
+				color: black;
 			}
 
 			#playEuqueueButtons {
-				width: 100%;
-				margin-top: 5px;
+				text-align: center;
+				position: absolute;
+				bottom: 0;
+				width: 96vw;
 			}
 
 			.playEuqueueButton {
-				width: 33%;
+				flex-grow: 1;
+				flex-basis: 0;
+				width: 32%;
 				margin: 0;
 			}
 		</style>
@@ -38,8 +56,7 @@
 			handle-as="json"
 			method="POST"
 			content-type="application/json"
-			on-response="handleResponse"
-			last-response="{{folderContents}}">
+			on-response="handleResponse">
 		</iron-ajax>
 		<iron-ajax
 			id="playEuqueueAjax"
@@ -49,44 +66,35 @@
 			on-response="playEnqueueResponse">
 		</iron-ajax>
 
-		<iron-list>
-			<div id="browseBreadcrumbs">
-				<paper-button raised on-tap="onBreadcrumTapped">/</paper-button>
+		<div id="browseBreadcrumbs">
+			<paper-button raised on-tap="onBreadcrumTapped" class="breadcrumb">/</paper-button>
 
-				<template is="dom-repeat" items="[[breadcrumbs]]">
-					<paper-button raised on-tap="onBreadcrumTapped" item="[[item]]">[[item.dir]]</paper-button>
-				</template>
-			</div>
+			<template is="dom-repeat" items="[[breadcrumbs]]">
+				<paper-button raised on-tap="onBreadcrumTapped" item="[[item]]" class="breadcrumb">[[item.dir]]</paper-button>
+			</template>
+		</div>
 
-			<div id="browseList">
-				<template is="dom-if" if="[[breadcrumbs.length]]">
-					<div on-tap="onBackTap" id="backEntry">
-						<iron-icon icon="icons:reply"></iron-icon>
-						<span class="text">Back</span>
-					</div>
-				</template>
-
-				<template is="dom-repeat" items="[[folderContents.data]]">
-					<div on-tap="onTap" file="[[item]]">
-						<template is="dom-if" if="[[item.isPlayable]]">
-							<paper-checkbox value="[[item.fullPath]]" on-change="checkboxChanged">
-								<span class="text">[[item.name]]</span>
-							</paper-checkbox>
-						</template>
-						<template is="dom-if" if="[[!item.isPlayable]]">
-							<iron-icon icon="[[getIcon(item)]]"></iron-icon>
+		<iron-list class="roundedContainer" items="[[folderContents]]">
+			<template>
+				<div class="entry" on-tap="onTap" file="[[item]]">
+					<template is="dom-if" if="[[item.isPlayable]]">
+						<paper-checkbox value="[[item.fullPath]]" on-change="checkboxChanged">
 							<span class="text">[[item.name]]</span>
-						</template>
-					</div>
-				</template>
-
-				<div id="playEuqueueButtons">
-					<paper-button raised on-tap="enqueueSelected" class="playEuqueueButton" id="browseEnqueueButton" disabled>Enqueue</paper-button>
-					<paper-button raised on-tap="insertAtSelected" class="playEuqueueButton" id="browseInsertAtButton" disabled>Insert at</paper-button>
-					<paper-button raised on-tap="playSelected" class="playEuqueueButton" id="browsePlayButton" disabled>Play</paper-button>
+						</paper-checkbox>
+					</template>
+					<template is="dom-if" if="[[!item.isPlayable]]">
+						<iron-icon icon="[[getIcon(item)]]"></iron-icon>
+						<span class$="{{getUnplayableClasses(item)}}">[[item.name]]</span>
+					</template>
 				</div>
-			</div>
+			</template>
 		</iron-list>
+
+		<div id="playEuqueueButtons" class="roundedContainer">
+			<paper-button raised on-tap="enqueueSelected" class="playEuqueueButton" id="browseEnqueueButton" disabled>Enqueue</paper-button>
+			<paper-button raised on-tap="insertAtSelected" class="playEuqueueButton" id="browseInsertAtButton" disabled>Insert at</paper-button>
+			<paper-button raised on-tap="playSelected" class="playEuqueueButton" id="browsePlayButton" disabled>Play</paper-button>
+		</div>
 
 		<opr-insert-at-dialog id="insertAtDialogElement"></opr-insert-at-dialog>
 
@@ -105,6 +113,10 @@
 					type: Array,
 					value: [],
 				},
+				folderContents: {
+					type: Array,
+					value: [],
+				}
 			},
 
 			attemptedFullPath: '/',
@@ -128,6 +140,9 @@
 			},
 
 			getIcon: function(item) {
+				if (item.isBack) {
+					return 'icons:reply';
+				}
 				if (item.isDir) {
 					return 'icons:folder';
 				}
@@ -135,10 +150,24 @@
 				return 'icons:clear';
 			},
 
+			getUnplayableClasses: function(item) {
+				let classes = [
+					'text',
+				];
+
+				if (!item.isBack && !item.isDir) {
+					classes.push('unclickable');
+				}
+
+				return classes.join(' ');
+			},
+
 			onTap: function(event) {
 				const file = event.currentTarget.file;
 
-				if (file.isDir) {
+				if (file.isBack) {
+					this.onBackTap();
+				} else if (file.isDir) {
 					this.sendRequest(file.fullPath);
 				}
 			},
@@ -189,12 +218,30 @@
 				this.breadcrumbs = breadcrumbs;
 			},
 
-			handleResponse: function() {
+			handleResponse: function(event) {
+				let response = event.detail.response.data,
+					folderContents = [];
+
+				for (let i = 0; i < response.length; i++) {
+					response[i].isBack = false;
+				}
+
 				this.currentFullPath = this.attemptedFullPath;
 				this.selectedFiles = [];
 				this.setBrowseButtonsDisabled(true);
 				localStorage.setItem('latestBrowseFullPath', this.currentFullPath);
 				this.setBreadcrumbs(this.currentFullPath);
+
+				if (this.breadcrumbs.length > 0) {
+					folderContents.push({
+						isBack: true,
+						isDir: false,
+						isPlayable: false,
+						name: 'Back',
+					});
+				}
+
+				this.folderContents = folderContents.concat(response);
 			},
 
 			checkboxChanged: function(event) {
