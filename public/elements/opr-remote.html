@@ -4,9 +4,28 @@
 			paper-button {
 				width: 100%;
 			}
+			iron-swipeable-pages {
+				height: 90%;
+			}
+			.page {
+				height: 100%;
+				@apply(--layout-vertical);
+			}
 			.flex-horizontal {
 				@apply(--layout-horizontal);
-				margin-top: 10px;
+				@apply(--layout-flex);
+				margin-top: 5px;
+				margin-bottom: 5px;
+			}
+
+			#pagesSlider {
+				height: 10%;
+				width: 100%;
+				text-align: center;
+			}
+			#pagesSliderIcons {
+				margin-left: auto;
+				margin-right: auto;
 			}
 		</style>
 
@@ -18,32 +37,79 @@
 			on-response="handleResponse">
 		</iron-ajax>
 
-		<div class="container flex-horizontal">
-			<paper-button raised on-tap="onTap" id="previous">Previous</paper-button>
-			<paper-button raised on-tap="onTap" id="next">Next</paper-button>
-		</div>
+		<iron-swipeable-pages
+			id="swipeablePages"
+			selected="{{selectedPage}}"
+			threshold="0.1">
 
-		<div class="container flex-horizontal">
-			<paper-button raised on-tap="onTap" id="play-pause">Play/Pause</paper-button>
-			<paper-button raised on-tap="onTap" id="play-file">Play file</paper-button>
-		</div>
+			<!-- main commands -->
+			<div class="page">
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="previous">Previous</paper-button>
+					<paper-button raised on-tap="onCommandTap" id="next">Next</paper-button>
+				</div>
 
-		<div class="container flex-horizontal">
-			<paper-button raised on-tap="onTap" id="back">Back</paper-button>
-			<paper-button raised on-tap="onTap" id="forward">Forward</paper-button>
-		</div>
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="play-pause">Play/Pause</paper-button>
+					<paper-button raised on-tap="onCommandTap" id="play-file">Play file</paper-button>
+				</div>
 
-		<div class="container flex-horizontal">
-			<paper-button raised on-tap="onTap" id="random">Random</paper-button>
-		</div>
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="back">Back</paper-button>
+					<paper-button raised on-tap="onCommandTap" id="forward">Forward</paper-button>
+				</div>
 
-		<div class="container flex-horizontal">
-			<paper-button raised on-tap="onTap" id="vol-down">Vol down</paper-button>
-			<paper-button raised on-tap="onTap" id="vol-up">Vol up</paper-button>
-		</div>
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="random">Random</paper-button>
+				</div>
 
-		<div class="container flex-horizontal">
-			<paper-button raised on-tap="onTap" id="browse">Browse</paper-button>
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="vol-down">Vol down</paper-button>
+					<paper-button raised on-tap="onCommandTap" id="vol-up">Vol up</paper-button>
+				</div>
+
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="browse">Browse</paper-button>
+				</div>
+			</div>
+
+			<!-- additional commands -->
+			<div class="page">
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="showInfo">Show info</paper-button>
+				</div>
+
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="increaseSpeed">Increase speed</paper-button>
+					<paper-button raised on-tap="onCommandTap" id="decreaseSpeed">Decrease speed</paper-button>
+				</div>
+
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="previousAudio">Previous audio</paper-button>
+					<paper-button raised on-tap="onCommandTap" id="nextAudio">Next audio</paper-button>
+				</div>
+
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="toggleSubtitles">Toggle subtitles</paper-button>
+				</div>
+
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="previousSubtitle">Previous subtitle</paper-button>
+					<paper-button raised on-tap="onCommandTap" id="nextSubtitle">Next subtitle</paper-button>
+				</div>
+
+				<div class="flex-horizontal">
+					<paper-button raised on-tap="onCommandTap" id="subtitleDelayPlus">Subtitle delay +</paper-button>
+					<paper-button raised on-tap="onCommandTap" id="subtitleDelayMinus">Subtitle delay -</paper-button>
+				</div>
+			</div>
+		</iron-swipeable-pages>
+
+		<div class="flex-horizontal" id="pagesSlider">
+			<div id="pagesSliderIcons">
+				<iron-icon icon="icons:radio-button-checked" on-tap="onPageIconTap" id="page1Icon"></iron-icon>
+				<iron-icon icon="icons:radio-button-unchecked" on-tap="onPageIconTap" id="page2Icon"></iron-icon>
+			</div>
 		</div>
 
 		<opr-random-dialog id="randomDialogElement"></opr-random-dialog>
@@ -57,6 +123,11 @@
 
 			properties: {
 				path: String,
+				selectedPage: {
+					type: Number,
+					value: 0,
+					observer: 'onPageChange'
+				},
 			},
 
 			sendCommand: function(url, method, body) {
@@ -67,7 +138,7 @@
 				this.$.commandAjax.generateRequest();
 			},
 
-			onTap: function(e) {
+			onCommandTap: function(e) {
 				const id = e.target.getAttribute('id');
 
 				if ('random' === id) {
@@ -86,6 +157,26 @@
 					});
 				} else if ('browse' === id) {
 					this.path = '/browse';
+				}
+			},
+
+			onPageIconTap: function(e) {
+				const id = e.target.getAttribute('id');
+
+				if ('page1Icon' === id) {
+					this.selectedPage = 0;
+				} else {
+					this.selectedPage = 1;
+				}
+			},
+
+			onPageChange: function() {
+				if (0 === this.selectedPage) {
+					this.$.page1Icon.icon = 'icons:radio-button-checked';
+					this.$.page2Icon.icon = 'icons:radio-button-unchecked';
+				} else {
+					this.$.page1Icon.icon = 'icons:radio-button-unchecked';
+					this.$.page2Icon.icon = 'icons:radio-button-checked';
 				}
 			},
 

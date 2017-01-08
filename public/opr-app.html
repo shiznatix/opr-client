@@ -27,29 +27,56 @@
 				font-size: 5vw;
 				flex-grow: 1;
 			}
+
+			/*paper-menu {
+				--paper-menu-background-color: var(--paper-blue-grey-900);
+				--paper-menu-color: var(--paper-blue-grey-400);
+			}
+			paper-item {
+				font-size: 4vw;
+			}*/
+			paper-menu-button {
+				--paper-menu-button-dropdown: {
+					max-width: 100%;
+				};
+			}
+			paper-item {
+				--paper-item: {
+					white-space: nowrap;
+					width: 100%;
+				};
+			}
+
+			iron-pages {
+				height: 100%;
+			}
 		</style>
 
 		<iron-location path="{{path}}"></iron-location>
 
 		<paper-scroll-header-panel fixed>
-			<paper-toolbar>
+			<paper-toolbar id="toolbar">
 				<iron-icon icon="arrow-back" id="backIcon" on-tap="backIconTapped"></iron-icon>
 				<iron-icon icon="weekend" id="appIcon" on-tap="appIconTapped"></iron-icon>
 				<h1 id="toolbarTitle">OMX Remote</h1>
-				<opr-menu-button id="menuButton"></opr-menu-button>
+
+				<paper-menu-button>
+					<paper-icon-button icon="menu" class="dropdown-trigger" alt="menu"></paper-icon-button>
+					<paper-menu class="dropdown-content">
+						<paper-item on-tap="randomSettingsTapped" class="text">Random settings</paper-item>
+					</paper-menu>
+				</paper-menu-button>
 			</paper-toolbar>
 
-			<div class="content">
-				<iron-pages
-					selected="[[path]]"
-					attr-for-selected="name"
-					role="main">
+			<iron-pages
+				selected="[[path]]"
+				attr-for-selected="name"
+				role="main">
 
-					<opr-remote name="/" id="remotePage"></opr-remote>
-					<opr-random-settings name="/random-settings" id="randomSettingsPage"></opr-random-settings>
-					<opr-browse name="/browse" id="browsePage"></opr-browse>
-				</iron-pages>
-			</div>
+				<opr-remote name="/"></opr-remote>
+				<opr-random-settings name="/random-settings"></opr-random-settings>
+				<opr-browse name="/browse"></opr-browse>
+			</iron-pages>
 		</paper-scroll-header-panel>
 	</template>
 	<script>
@@ -78,6 +105,10 @@
 			},
 
 			appIconTapped: function() {},
+
+			randomSettingsTapped: function() {
+				this.path = '/random-settings';
+			},
 		});
 	</script>
 </dom-module>

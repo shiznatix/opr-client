@@ -2,7 +2,12 @@
 	<template>
 		<style include="opr-shared-styles">
 			.checkboxGroup {
-				background-color: var(--paper-blue-grey-700);
+				font-size: 6vw;
+			}
+
+			paper-checkbox {
+				width: 100%;
+				border-bottom: 1px solid var(--paper-blue-grey-900);
 			}
 		</style>
 
@@ -22,9 +27,7 @@
 
 					<div class="checkboxGroup">
 						<template is="dom-repeat" items="[[item.shows]]">
-							<div>
-								<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="{{checkboxChecked(item)}}">[[item]]</paper-checkbox>
-							</div>
+							<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="{{checkboxChecked(item)}}">[[item]]</paper-checkbox>
 						</template>
 					</div>
 				</iron-accordion>
