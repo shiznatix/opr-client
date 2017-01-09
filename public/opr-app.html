@@ -3,6 +3,23 @@
 <dom-module id="opr-app">
 	<template>
 		<style include="opr-shared-styles">
+			paper-drawer-panel {
+				--paper-drawer-panel-left-drawer-container: {
+					background-color: var(--paper-blue-grey-700);
+				};
+			}
+
+			.navItem {
+				height: 8vh;
+				line-height: 8vh;
+				font-size: 5vw;
+				padding: 2vw;
+				border-bottom: 1px solid var(--paper-blue-grey-900);
+			}
+			.navSelected {
+				background-color: var(--paper-blue-grey-800);
+			}
+
 			paper-scroll-header-panel {
 				position: absolute;
 				top: 0;
@@ -17,34 +34,14 @@
 				background-color: var(--paper-blue-900);
 			}
 
-			iron-icon {
+			#appIcon {
 				--iron-icon-fill-color: var(--paper-blue-900);
 				--iron-icon-stroke-color: var(--paper-blue-200);
-				margin-right: 1vw;
+				margin-right: 3vw;
 			}
 
 			#toolbarTitle {
 				font-size: 5vw;
-				flex-grow: 1;
-			}
-
-			/*paper-menu {
-				--paper-menu-background-color: var(--paper-blue-grey-900);
-				--paper-menu-color: var(--paper-blue-grey-400);
-			}
-			paper-item {
-				font-size: 4vw;
-			}*/
-			paper-menu-button {
-				--paper-menu-button-dropdown: {
-					max-width: 100%;
-				};
-			}
-			paper-item {
-				--paper-item: {
-					white-space: nowrap;
-					width: 100%;
-				};
 			}
 
 			iron-pages {
@@ -54,30 +51,42 @@
 
 		<iron-location path="{{path}}"></iron-location>
 
-		<paper-scroll-header-panel fixed>
-			<paper-toolbar id="toolbar">
-				<iron-icon icon="arrow-back" id="backIcon" on-tap="backIconTapped"></iron-icon>
-				<iron-icon icon="weekend" id="appIcon" on-tap="appIconTapped"></iron-icon>
-				<h1 id="toolbarTitle">OMX Remote</h1>
+		<paper-drawer-panel id="paperDrawerPanel" disable-edge-swipe force-narrow>
+			<div drawer>
+				<div on-tap="onNavTap" class="text navItem" id="navRemote" data-path="/">
+					<iron-icon icon="icons:settings-remote"></iron-icon>
+					Remote
+				</div>
+				<div on-tap="onNavTap" class="text navItem" id="navBrowse" data-path="/browse">
+					<iron-icon icon="icons:folder"></iron-icon>
+					Browse
+				</div>
+				<div on-tap="onNavTap" class="text navItem" id="navRandomSettings" data-path="random-settings">
+					<iron-icon icon="icons:settings"></iron-icon>
+					Random settings
+				</div>
+			</div>
 
-				<paper-menu-button>
-					<paper-icon-button icon="menu" class="dropdown-trigger" alt="menu"></paper-icon-button>
-					<paper-menu class="dropdown-content">
-						<paper-item on-tap="randomSettingsTapped" class="text">Random settings</paper-item>
-					</paper-menu>
-				</paper-menu-button>
-			</paper-toolbar>
+			<div main>
+				<paper-scroll-header-panel fixed>
+					<paper-toolbar id="toolbar">
+						<iron-icon icon="notification:ondemand-video" id="appIcon" paper-drawer-toggle on-tap="appIconTapped"></iron-icon>
 
-			<iron-pages
-				selected="[[path]]"
-				attr-for-selected="name"
-				role="main">
+						<h1 id="toolbarTitle">OMX Remote</h1>
+					</paper-toolbar>
 
-				<opr-remote name="/"></opr-remote>
-				<opr-random-settings name="/random-settings"></opr-random-settings>
-				<opr-browse name="/browse"></opr-browse>
-			</iron-pages>
-		</paper-scroll-header-panel>
+					<iron-pages
+						selected="[[path]]"
+						attr-for-selected="name"
+						role="main">
+
+						<opr-remote name="/"></opr-remote>
+						<opr-random-settings name="/random-settings"></opr-random-settings>
+						<opr-browse name="/browse"></opr-browse>
+					</iron-pages>
+				</paper-scroll-header-panel>
+			</div>
+		</paper-drawer-panel>
 	</template>
 	<script>
 		Polymer({
@@ -91,23 +100,19 @@
 			},
 
 			pathChanged: function() {
-				if ('/' === this.path) {
-					this.$.appIcon.hidden = false;
-					this.$.backIcon.hidden = true;
-				} else {
-					this.$.appIcon.hidden = true;
-					this.$.backIcon.hidden = false;
-				}
+				this.toggleClass('navSelected', ('/' === this.path), this.$.navRemote);
+				this.toggleClass('navSelected', ('/browse' === this.path), this.$.navBrowse);
+				this.toggleClass('navSelected', ('/random-settings' === this.path), this.$.navRandomSettings);
 			},
 
-			backIconTapped: function() {
-				window.history.back();
+			appIconTapped: function() {
 			},
 
-			appIconTapped: function() {},
+			onNavTap: function(e) {
+				const newPath = e.target.getAttribute('data-path');
 
-			randomSettingsTapped: function() {
-				this.path = '/random-settings';
+				this.path = newPath;
+				this.$.paperDrawerPanel.closeDrawer();
 			},
 		});
 	</script>
