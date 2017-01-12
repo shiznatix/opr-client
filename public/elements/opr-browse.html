@@ -6,36 +6,41 @@
 				@apply(--layout-vertical);
 			}
 
-			#browseBreadcrumbs {
-				margin: 5px;
+			#currentPathContainer {
+				@apply(--layout-horizontal);
+				background-color: var(--paper-blue-grey-200);
+				color: var(--paper-blue-grey-900);
+				align-items: center;
+				height: 10vmin;
 			}
-			.breadcrumb {
-				margin-right: 0;
-				margin-left: 0;
-				margin-bottom: 5px;
+			#currentPath {
+				@apply(--layout-flex);
+				padding: 0.5vmin;
+				white-space: nowrap;
+				overflow: hidden;
+				text-align: left;
+				direction: rtl;
+				height: 100%;
+				/*
+				-webkit-mask-image: -webkit-linear-gradient(right, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
+				*/
+			}
+			#currentPathContainer paper-button {
+				font-size: 3vmin;
+				padding: 1vmin;
+				margin: 0;
 				min-width: 0;
-				font-size: 3vw;
+			}
+			#backButton {
+				margin-left: 15px;
+			}
+			#backButton iron-icon {
+				width: 3vmin;
+				height: 3vmin;
 			}
 
 			iron-list {
 				@apply(--layout-flex);
-			}
-			paper-checkbox {
-				width: 100%;
-			}
-
-			.entry {
-				height: 8vh;
-				line-height: 8vh;
-				font-size: 5vw;
-			}
-			.entry:after {
-				content: '';
-				position: absolute;
-				bottom: 0px;
-				left: 3%;
-				width: 94%;
-				border-bottom: 1px solid var(--paper-blue-grey-900);
 			}
 
 			.unclickable {
@@ -69,17 +74,21 @@
 		</iron-ajax>
 
 		<div id="browseContainer">
-			<div id="browseBreadcrumbs">
-				<paper-button raised on-tap="onBreadcrumTapped" class="breadcrumb">/</paper-button>
-
-				<template is="dom-repeat" items="[[breadcrumbs]]">
-					<paper-button raised on-tap="onBreadcrumTapped" item="[[item]]" class="breadcrumb">[[item.dir]]</paper-button>
-				</template>
+			<div id="currentPathContainer">
+				<div id="currentPath">
+					<template is="dom-repeat" items="[[breadcrumbs]]">
+						<paper-button on-tap="onBreadcrumTapped" item="[[item]]" class="breadcrumb">[[item.dir]]</paper-button>
+					</template>
+					<paper-button on-tap="onBreadcrumTapped" class="breadcrumb">/</paper-button>
+				</div>
+				<div on-tap="onBackTap" id="backButton">
+					<paper-button><iron-icon icon="icons:reply"></iron-icon>Back</paper-button>
+				</div>
 			</div>
 
 			<iron-list class="roundedContainer" items="[[folderContents]]">
 				<template>
-					<div class="entry" on-tap="onTap" file="[[item]]">
+					<div class="listEntry" on-tap="onTap" file="[[item]]">
 						<template is="dom-if" if="[[item.isPlayable]]">
 							<paper-checkbox value="[[item.fullPath]]" on-change="checkboxChanged">
 								<span class="text">[[item.name]]</span>
@@ -120,11 +129,14 @@
 				folderContents: {
 					type: Array,
 					value: [],
-				}
+				},
+				currentFullPath: {
+					type: String,
+					value: '/',
+				},
 			},
 
 			attemptedFullPath: '/',
-			currentFullPath: '/',
 			selectedFiles: [],
 
 			sendRequest: function(dir) {
@@ -144,9 +156,6 @@
 			},
 
 			getIcon: function(item) {
-				if (item.isBack) {
-					return 'icons:reply';
-				}
 				if (item.isDir) {
 					return 'icons:folder';
 				}
@@ -159,7 +168,7 @@
 					'text',
 				];
 
-				if (!item.isBack && !item.isDir) {
+				if (!item.isDir) {
 					classes.push('unclickable');
 				}
 
@@ -169,14 +178,13 @@
 			onTap: function(event) {
 				const file = event.currentTarget.file;
 
-				if (file.isBack) {
-					this.onBackTap();
-				} else if (file.isDir) {
+				if (file.isDir) {
 					this.sendRequest(file.fullPath);
 				}
 			},
 
 			onBackTap: function() {
+				// TODO Warning! this is not correct when we have the breadcrumbs "reversed"
 				this.breadcrumbs.pop();
 
 				let dir;
@@ -219,33 +227,18 @@
 					});
 				}
 
-				this.breadcrumbs = breadcrumbs;
+				this.breadcrumbs = breadcrumbs.reverse();
 			},
 
 			handleResponse: function(event) {
-				let response = event.detail.response.data,
-					folderContents = [];
-
-				for (let i = 0; i < response.length; i++) {
-					response[i].isBack = false;
-				}
+				const response = event.detail.response.data;
 
 				this.currentFullPath = this.attemptedFullPath;
 				this.selectedFiles = [];
 				this.setBrowseButtonsDisabled(true);
 				localStorage.setItem('latestBrowseFullPath', this.currentFullPath);
 				this.setBreadcrumbs(this.currentFullPath);
-
-				if (this.breadcrumbs.length > 0) {
-					folderContents.push({
-						isBack: true,
-						isDir: false,
-						isPlayable: false,
-						name: 'Back',
-					});
-				}
-
-				this.folderContents = folderContents.concat(response);
+				this.folderContents = response;
 			},
 
 			checkboxChanged: function(event) {

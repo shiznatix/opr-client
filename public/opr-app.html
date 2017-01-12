@@ -12,8 +12,8 @@
 			.navItem {
 				height: 8vh;
 				line-height: 8vh;
-				font-size: 5vw;
-				padding: 2vw;
+				font-size: 5vmin;
+				padding: 2vmin;
 				border-bottom: 1px solid var(--paper-blue-grey-900);
 			}
 			.navSelected {
@@ -37,11 +37,11 @@
 			#appIcon {
 				--iron-icon-fill-color: var(--paper-blue-900);
 				--iron-icon-stroke-color: var(--paper-blue-200);
-				margin-right: 3vw;
+				margin-right: 3vmin;
 			}
 
 			#toolbarTitle {
-				font-size: 5vw;
+				font-size: 5vmin;
 			}
 
 			iron-pages {
@@ -109,7 +109,13 @@
 			},
 
 			onNavTap: function(e) {
-				const newPath = e.target.getAttribute('data-path');
+				let target = e.target;
+
+				if ('div' !== e.target.tagName.toLowerCase()) {
+					target = target.parentElement;
+				}
+
+				const newPath = target.getAttribute('data-path');
 
 				this.path = newPath;
 				this.$.paperDrawerPanel.closeDrawer();

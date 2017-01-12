@@ -1,14 +1,6 @@
 <dom-module id="opr-random-settings">
 	<template>
 		<style include="opr-shared-styles">
-			.checkboxGroup {
-				font-size: 6vw;
-			}
-
-			paper-checkbox {
-				width: 100%;
-				border-bottom: 1px solid var(--paper-blue-grey-900);
-			}
 		</style>
 
 		<iron-location path="{{path}}"></iron-location>
@@ -25,9 +17,11 @@
 				<iron-accordion>
 					<h2 header>[[item.categoryName]]</h2>
 
-					<div class="checkboxGroup">
+					<div class="roundedContainer">
 						<template is="dom-repeat" items="[[item.shows]]">
-							<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="{{checkboxChecked(item)}}">[[item]]</paper-checkbox>
+							<div class="listEntry">
+								<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="{{checkboxChecked(item)}}">[[item]]</paper-checkbox>
+							</div>
 						</template>
 					</div>
 				</iron-accordion>

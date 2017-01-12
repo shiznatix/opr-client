@@ -14,13 +14,15 @@
 				--paper-radio-button-unchecked-background-color: var(--paper-blue-grey-800);
 				--paper-radio-button-unchecked-color: var(--paper-blue-grey-700);
 				--paper-radio-button-checked-color: var(--paper-blue-grey-200);
+				--paper-radio-button-size: 7vmin;
+				font-size: 3vmin;
 			}
 
 			paper-button {
 				background-color: var(--paper-blue-grey-800);
 				color: var(--paper-blue-grey-200);
 				font-weight: bold;
-				font-size: 4vw;
+				font-size: 4vmin;
 			}
 
 			iron-accordion {
@@ -35,8 +37,8 @@
 			iron-icon {
 				--iron-icon-fill-color: var(--paper-blue-grey-300);
 				--iron-icon-stroke-color: var(--paper-blue-grey-200);
-				--iron-icon-height: 8vw;
-				--iron-icon-width: 8vw;
+				--iron-icon-height: 8vmin;
+				--iron-icon-width: 8vmin;
 			}
 
 			paper-checkbox {
@@ -44,14 +46,17 @@
 				--paper-checkbox-unchecked-background-color: var(--paper-blue-grey-300);
 				--paper-checkbox-unchecked-color: var(--paper-blue-grey-200);
 				--paper-checkbox-checked-color: var(--paper-blue-grey-200);
-				--paper-checkbox-label-spacing: 1vw;
-				--paper-checkbox-size: 7vw;
-				--paper-checkbox-margin: 1vw;
+				--paper-checkbox-label-spacing: 1vmin;
+				--paper-checkbox-size: 6vmin;
+				--paper-checkbox-margin: 1vmin;
+				width: 100%;
 			}
 
 			h2 {
 				color: var(--paper-blue-grey-200);
-				font-size: 8vw;
+				font-size: 6vmin;
+				height: 7vmin;
+				line-height: 7vmin;
 			}
 
 			.text {
@@ -60,9 +65,28 @@
 
 			.roundedContainer {
 				background-color: var(--paper-blue-grey-700);
-				margin: 1vw;
-				border-radius: 2vw;
-				padding: 1vw;
+				margin: 0.5vmin;
+				border-radius: 2vmin;
+				padding: 1vmin;
+			}
+
+			.dialogButtons paper-button {
+				background-color: var(--paper-blue-grey-900);
+				font-size: 3vmin;
+			}
+
+			.listEntry {
+				height: 12vmin;
+				line-height: 12vmin;
+				font-size: 5vmin;
+			}
+			.listEntry:after {
+				content: '';
+				position: absolute;
+				bottom: 0px;
+				left: 3%;
+				width: 94%;
+				border-bottom: 1px solid var(--paper-blue-grey-900);
 			}
 		</style>
 	</template>
