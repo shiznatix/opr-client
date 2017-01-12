@@ -1,14 +1,14 @@
-const currentDir = __dirname,
-	config = require(`${currentDir}/config/config.json`),
+const config = require(`${__dirname}/config/config.json`),
+	playerConfig = require(`${__dirname}/config/player-config.json`),
 	express = require('express'),
 	bodyParser = require('body-parser'),
-	player = require(`${currentDir}/lib/player.js`),
-	Playlist = require(`${currentDir}/lib/playlist.js`),
+	player = require(`${__dirname}/lib/player.js`),
+	Playlist = require(`${__dirname}/lib/playlist.js`),
 	playlist = new Playlist(player),
-	server = require(`${currentDir}/lib/server.js`),
-	browse = require(`${currentDir}/lib/browse.js`),
-	validator = require(`${currentDir}/lib/validator.js`),
-	logger = require(`${currentDir}/lib/logger.js`),
+	server = require(`${__dirname}/lib/server.js`),
+	browse = require(`${__dirname}/lib/browse.js`),
+	validator = require(`${__dirname}/lib/validator.js`),
+	logger = require(`${__dirname}/lib/logger.js`),
 	_ = require('lodash'),
 	app = express();
 
@@ -52,49 +52,23 @@ app.get('/browse', (request, response) => {
 });
 
 // API player routes
-app.get('/close-player', (request, response) => {
-	player.close();
-	respond(response, error);
-});
-app.get('/volume-down', (request, response) => {
-	player.volumeDown();
-	respond(response, error);
-});
-app.get('/volume-up', (request, response) => {
-	player.volumeUp();
-	respond(response, error);
-});
-app.get('/play-pause', (request, response) => {
-	player.playPause();
-	respond(response, error);
-});
-app.get('/forward', (request, response) => {
-	player.forward();
-	respond(response, error);
-});
-app.get('/back', (request, response) => {
-	player.back();
-	respond(response, error);
+_.forEach(playerConfig, (data) => {
+	app.get(`/${data.route}`, (request, response) => {
+		player.runCommand(data.command);
+		successResponse(response);
+	});
 });
 
 // API playlist routes
 app.get('/current-playlist', (request, response) => {
-	playlist.get().then((data) => {
-		successResponse(response, data);
-	}).catch((error) => {
-		logger.error(error);
-		errorResponse(response, error);
-	});
+	successResponse(response, playlist.get());
 });
 app.post('/set-playlist', (request, response) => {
 	validator.setPlaylist(request.body).then((params) => {
-		return playlist.set(params.filePaths).then(() => {
-			return playlist.playAt(0);
-		}).then(() => {
-			return playlist.get();
-		});
-	}).then((data) => {
-		successResponse(response, data);
+		return playlist.set(params.filePaths);
+	}).then(() => {
+		playlist.playAt(0);
+		successResponse(response, playlist.get());
 	}).catch((error) => {
 		logger.error(error);
 		errorResponse(response, error);
@@ -102,11 +76,9 @@ app.post('/set-playlist', (request, response) => {
 });
 app.post('/enqueue-playlist', (request, response) => {
 	validator.setPlaylist(request.body).then((params) => {
-		return playlist.enqueue(params.filePaths).then(() => {
-			return playlist.get();
-		});
-	}).then((data) => {
-		successResponse(response, data);
+		return playlist.enqueue(params.filePaths);
+	}).then(() => {
+		successResponse(response, playlist.get());
 	}).catch((error) => {
 		logger.error(error);
 		errorResponse(response, error);
@@ -114,37 +86,23 @@ app.post('/enqueue-playlist', (request, response) => {
 });
 app.post('/set-at-playlist', (request, response) => {
 	validator.setAtPlaylist(request.body).then((params) => {
-		return playlist.setAt(params.filePaths, params.atIndex).then(() => {
-			return playlist.get();
-		});
-	}).then((data) => {
-		successResponse(response, data);
+		return playlist.setAt(params.filePaths, params.atIndex);
+	}).then(() => {
+		successResponse(response, playlist.get());
 	}).catch((error) => {
 		logger.error(error);
 		errorResponse(response, error);
 	});
 });
 app.get('/previous', (request, response) => {
-	playlist.previous().then((data) => {
-		successResponse(response, data);
-	}).catch((error) => {
-		logger.error(error);
-		errorResponse(response, error);
-	});
+	successResponse(response, playlist.previous());
 });
 app.get('/next', (request, response) => {
-	playlist.next().then((data) => {
-		successResponse(response, data);
-	}).catch((error) => {
-		logger.error(error);
-		errorResponse(response, error);
-	});
+	successResponse(response, playlist.next());
 });
 app.post('/play-at', (request, response) => {
 	validator.playAt(request.body).then((params) => {
-		return playlist.playAt(params.index);
-	}).then((data) => {
-		successResponse(response, data);
+		successResponse(response, playlist.playAt(params.index));
 	}).catch((error) => {
 		logger.error(error);
 		errorResponse(response, error);
@@ -174,9 +132,7 @@ app.post('/random', (request, response) => {
 			});
 		}
 	}).then(() => {
-		return playlist.get();
-	}).then((data) => {
-		successResponse(response, data);
+		successResponse(response, playlist.get());
 	}).catch((error) => {
 		logger.error(error);
 		errorResponse(response, error);

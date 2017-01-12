@@ -1,0 +1,62 @@
+[
+  {
+  	"route": "close-player",
+  	"command": "q"
+  },
+  {
+  	"route": "volume-down",
+  	"command": "-"
+  },
+  {
+  	"route": "volume-up",
+  	"command": "+"
+  },
+  {
+  	"route": "play-pause",
+  	"command": " "
+  },
+  {
+  	"route": "back",
+  	"command": "^[[D"
+  },
+  {
+  	"route": "forward",
+  	"command": "^[[C"
+  },
+  {
+  	"route": "decrease-speed",
+  	"command": "1"
+  },
+  {
+  	"route": "increase-speed",
+  	"command": "2"
+  },
+  {
+  	"route": "previous-audio",
+  	"command": "j"
+  },
+  {
+  	"route": "next-audio",
+  	"command": "k"
+  },
+  {
+  	"route": "toggle-subtitles",
+  	"command": "s"
+  },
+  {
+  	"route": "previous-subtitle",
+  	"command": "n"
+  },
+  {
+  	"route": "next-subtitle",
+  	"command": "m"
+  },
+  {
+  	"route": "subtitle-delay-minus",
+  	"command": "d"
+  },
+  {
+  	"route": "subtitle-delay-plus",
+  	"command": "f"
+  }
+]

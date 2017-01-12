@@ -56,7 +56,7 @@
 
 					<div class="flex-horizontal">
 						<paper-button raised on-tap="onCommandTap" id="play-pause">Play/Pause</paper-button>
-						<paper-button raised on-tap="onCommandTap" id="play-file">Play file</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="play-at">Play file</paper-button>
 					</div>
 
 					<div class="flex-horizontal">
@@ -69,39 +69,39 @@
 					</div>
 
 					<div class="flex-horizontal">
-						<paper-button raised on-tap="onCommandTap" id="vol-down">Vol down</paper-button>
-						<paper-button raised on-tap="onCommandTap" id="vol-up">Vol up</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="volume-down">Vol down</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="volume-up">Vol up</paper-button>
 					</div>
 				</div>
 
 				<!-- additional commands -->
 				<div class="page">
 					<div class="flex-horizontal">
-						<paper-button raised on-tap="onCommandTap" id="showInfo">Show info</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="increase-speed">Increase speed</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="decrease-speed">Decrease speed</paper-button>
 					</div>
 
 					<div class="flex-horizontal">
-						<paper-button raised on-tap="onCommandTap" id="increaseSpeed">Increase speed</paper-button>
-						<paper-button raised on-tap="onCommandTap" id="decreaseSpeed">Decrease speed</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="previous-audio">Previous audio</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="next-audio">Next audio</paper-button>
 					</div>
 
 					<div class="flex-horizontal">
-						<paper-button raised on-tap="onCommandTap" id="previousAudio">Previous audio</paper-button>
-						<paper-button raised on-tap="onCommandTap" id="nextAudio">Next audio</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="toggle-subtitles">Toggle subtitles</paper-button>
 					</div>
 
 					<div class="flex-horizontal">
-						<paper-button raised on-tap="onCommandTap" id="toggleSubtitles">Toggle subtitles</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="previous-subtitle">Previous subtitle</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="next-subtitle">Next subtitle</paper-button>
 					</div>
 
 					<div class="flex-horizontal">
-						<paper-button raised on-tap="onCommandTap" id="previousSubtitle">Previous subtitle</paper-button>
-						<paper-button raised on-tap="onCommandTap" id="nextSubtitle">Next subtitle</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="subtitle-delay-plus">Subtitle delay +</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="subtitle-delay-minus">Subtitle delay -</paper-button>
 					</div>
 
 					<div class="flex-horizontal">
-						<paper-button raised on-tap="onCommandTap" id="subtitleDelayPlus">Subtitle delay +</paper-button>
-						<paper-button raised on-tap="onCommandTap" id="subtitleDelayMinus">Subtitle delay -</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="close-player">Close player</paper-button>
 					</div>
 				</div>
 			</iron-swipeable-pages>
@@ -153,12 +153,14 @@
 							showNames: showNames,
 						});
 					});
-				} else if ('play-file' === id) {
+				} else if ('play-at' === id) {
 					this.$.playFileDialogElement.open((playIndex) => {
 						this.sendCommand('play-at', 'POST', {
 							index: playIndex,
 						});
 					});
+				} else {
+					this.sendCommand(id, 'GET');
 				}
 			},
 
