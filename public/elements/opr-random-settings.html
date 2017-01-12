@@ -1,6 +1,12 @@
 <dom-module id="opr-random-settings">
 	<template>
 		<style include="opr-shared-styles">
+			.showlistContainer {
+				background-color: var(--paper-blue-grey-700);
+				margin: 0.5vmin;
+				border-radius: 2vmin;
+				padding: 1vmin;
+			}
 		</style>
 
 		<iron-location path="{{path}}"></iron-location>
@@ -17,7 +23,7 @@
 				<iron-accordion>
 					<h2 header>[[item.categoryName]]</h2>
 
-					<div class="roundedContainer">
+					<div class="showlistContainer">
 						<template is="dom-repeat" items="[[item.shows]]">
 							<div class="listEntry">
 								<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="{{checkboxChecked(item)}}">[[item]]</paper-checkbox>

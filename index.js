@@ -53,34 +53,28 @@ app.get('/browse', (request, response) => {
 
 // API player routes
 app.get('/close-player', (request, response) => {
-	player.close((error) => {
-		respond(response, error);
-	});
+	player.close();
+	respond(response, error);
 });
 app.get('/volume-down', (request, response) => {
-	player.volumeDown((error) => {
-		respond(response, error);
-	});
+	player.volumeDown();
+	respond(response, error);
 });
 app.get('/volume-up', (request, response) => {
-	player.volumeUp((error) => {
-		respond(response, error);
-	});
+	player.volumeUp();
+	respond(response, error);
 });
 app.get('/play-pause', (request, response) => {
-	player.playPause((error) => {
-		respond(response, error);
-	});
+	player.playPause();
+	respond(response, error);
 });
 app.get('/forward', (request, response) => {
-	player.forward((error) => {
-		respond(response, error);
-	});
+	player.forward();
+	respond(response, error);
 });
 app.get('/back', (request, response) => {
-	player.back((error) => {
-		respond(response, error);
-	});
+	player.back();
+	respond(response, error);
 });
 
 // API playlist routes

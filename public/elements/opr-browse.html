@@ -4,6 +4,7 @@
 			#browseContainer {
 				height: 100%;
 				@apply(--layout-vertical);
+				background-color: var(--paper-blue-grey-700);
 			}
 
 			#currentPathContainer {
@@ -86,7 +87,7 @@
 				</div>
 			</div>
 
-			<iron-list class="roundedContainer" items="[[folderContents]]">
+			<iron-list items="[[folderContents]]">
 				<template>
 					<div class="listEntry" on-tap="onTap" file="[[item]]">
 						<template is="dom-if" if="[[item.isPlayable]]">
@@ -102,7 +103,7 @@
 				</template>
 			</iron-list>
 
-			<div id="playEuqueueButtons" class="roundedContainer">
+			<div id="playEuqueueButtons">
 				<paper-button raised on-tap="enqueueSelected" class="playEuqueueButton" id="browseEnqueueButton" disabled>Enqueue</paper-button>
 				<paper-button raised on-tap="insertAtSelected" class="playEuqueueButton" id="browseInsertAtButton" disabled>Insert at</paper-button>
 				<paper-button raised on-tap="playSelected" class="playEuqueueButton" id="browsePlayButton" disabled>Play</paper-button>
