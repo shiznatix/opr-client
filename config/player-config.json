@@ -16,12 +16,20 @@
   	"command": " "
   },
   {
-  	"route": "back",
-  	"command": "^[[D"
+    "route": "back",
+    "command": "^[[D"
   },
   {
-  	"route": "forward",
-  	"command": "^[[C"
+    "route": "forward",
+    "command": "^[[C"
+  },
+  {
+    "route": "back-large",
+    "command": ""
+  },
+  {
+    "route": "forward-large",
+    "command": ""
   },
   {
   	"route": "decrease-speed",
