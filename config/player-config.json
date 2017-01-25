@@ -25,11 +25,11 @@
   },
   {
     "route": "back-large",
-    "command": ""
+    "command": "^[[B"
   },
   {
     "route": "forward-large",
-    "command": ""
+    "command": "^[[A"
   },
   {
   	"route": "decrease-speed",

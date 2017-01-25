@@ -1,0 +1,13 @@
+Create install script
+	deps:
+		- bower (npm install -g bower)
+		- omxplayer (sudo apt-get install omxplayer)
+		- node 6 or greater
+		- sshfs (maybe, if client and server is not local)
+	install:
+		- npm install
+		- cd public && bower install && cd ..
+
+Should we have in config the folder mappings from server to client for random plays? This should be configurable somewhat.
+	- Remove mount bash file
+	- On start, ensure these folders exist and maybe even try to mount if server is not local
