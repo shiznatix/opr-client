@@ -13,20 +13,25 @@
 		<paper-dialog
 			entry-animation="scale-up-animation"
 			exit-animation="fade-out-animation"
+			on-iron-overlay-opened="opened"
 			id="playFileDialog">
 
 			<h2>Play file</h2>
 
-			<paper-spinner active id="playFileLoadingSpinner"></paper-spinner>
+			<paper-dialog-scrollable>
+				<div class="centerText">
+					<paper-spinner active id="playFileLoadingSpinner"></paper-spinner>
+				</div>
 
-			<paper-radio-group on-change="indexOnChange" id="indexRadio" attr-for-selected="value">
-				<template is="dom-repeat" items="[[ajaxResponse.data]]">
-					<paper-radio-button value="[[index]]">[[item.fileName]]</paper-radio-button>
-					<br />
-				</template>
-			</paper-radio-group>
+				<paper-radio-group on-change="indexOnChange" id="indexRadio" attr-for-selected="value">
+					<template is="dom-repeat" items="[[ajaxResponse.data]]">
+						<paper-radio-button value="[[index]]">[[item.fileName]]</paper-radio-button>
+						<br />
+					</template>
+				</paper-radio-group>
+			</paper-dialog-scrollable>
 
-			<div class="dialogButtons">
+			<div class="buttons">
 				<paper-button dialog-dismiss>Cancel</paper-button>
 				<paper-button dialog-confirm disabled id="playButton" on-tap="playPressed">Play</paper-button>
 			</div>
@@ -51,6 +56,9 @@
 				this.$.indexRadio.hidden = true;
 				this.$.playFileLoadingSpinner.hidden = false;
 				this.$.playFileDialog.open();
+			},
+
+			opened: function() {
 				this.$.currentPlaylistAjax.generateRequest();
 			},
 
@@ -58,6 +66,10 @@
 				this.clearSelectedIndex();
 				this.$.indexRadio.hidden = false;
 				this.$.playFileLoadingSpinner.hidden = true;
+
+				this.async(() => {
+					this.$.playFileDialog.notifyResize();
+				});
 			},
 
 			indexOnChange: function(e) {

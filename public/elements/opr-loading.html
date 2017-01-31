@@ -1,0 +1,26 @@
+<dom-module id="opr-loading">
+	<template>
+		<style include="opr-shared-styles">
+			.text {
+				font-size: 8vmin;
+				margin-bottom: 2vh;
+			}
+		</style>
+
+		<div class="centerVertical">
+			<div class="centerVerticalContent">
+				<div class="text">
+					Loading&hellip;
+				</div>
+				<div>
+					<paper-spinner active></paper-spinner>
+				</div>
+			</div>
+		</div>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-loading',
+		});
+	</script>
+</dom-module>

@@ -29,6 +29,11 @@
 
 				this.$.toast.open();
 			},
+
+			toastMessage: function(message) {
+				this.$.toast.text = message;
+				this.$.toast.open();
+			},
 		});
 	</script>
 </dom-module>

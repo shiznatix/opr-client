@@ -3,23 +3,6 @@
 <dom-module id="opr-app">
 	<template>
 		<style include="opr-shared-styles">
-			paper-drawer-panel {
-				--paper-drawer-panel-left-drawer-container: {
-					background-color: var(--paper-blue-grey-700);
-				};
-			}
-
-			.navItem {
-				height: 8vh;
-				line-height: 8vh;
-				font-size: 5vmin;
-				padding: 2vmin;
-				border-bottom: 1px solid var(--paper-blue-grey-900);
-			}
-			.navSelected {
-				background-color: var(--paper-blue-grey-800);
-			}
-
 			paper-scroll-header-panel {
 				position: absolute;
 				top: 0;
@@ -37,11 +20,13 @@
 			#appIcon {
 				--iron-icon-fill-color: var(--paper-blue-900);
 				--iron-icon-stroke-color: var(--paper-blue-200);
-				margin-right: 3vmin;
 			}
 
-			#toolbarTitle {
-				font-size: 5vmin;
+			paper-icon-button {
+				color: var(--paper-blue-200);
+			}
+			paper-icon-button[disabled] {
+				color: var(--paper-blue-800);
 			}
 
 			iron-pages {
@@ -51,42 +36,45 @@
 
 		<iron-location path="{{path}}"></iron-location>
 
-		<paper-drawer-panel id="paperDrawerPanel" disable-edge-swipe force-narrow>
-			<div drawer>
-				<div on-tap="onNavTap" class="text navItem" id="navRemote" data-path="/">
-					<iron-icon icon="icons:settings-remote"></iron-icon>
-					Remote
-				</div>
-				<div on-tap="onNavTap" class="text navItem" id="navBrowse" data-path="/browse">
-					<iron-icon icon="icons:folder"></iron-icon>
-					Browse
-				</div>
-				<div on-tap="onNavTap" class="text navItem" id="navRandomSettings" data-path="random-settings">
-					<iron-icon icon="icons:settings"></iron-icon>
-					Random settings
-				</div>
-			</div>
+		<paper-scroll-header-panel fixed>
+			<paper-toolbar>
+				<iron-icon
+					icon="notification:ondemand-video"
+					id="appIcon">
+				</iron-icon>
 
-			<div main>
-				<paper-scroll-header-panel fixed>
-					<paper-toolbar id="toolbar">
-						<iron-icon icon="notification:ondemand-video" id="appIcon" paper-drawer-toggle on-tap="appIconTapped"></iron-icon>
+				<span class="title">OMX Remote</span>
 
-						<h1 id="toolbarTitle">OMX Remote</h1>
-					</paper-toolbar>
+				<paper-icon-button
+					icon="icons:settings-remote"
+					on-tap="onNavTap"
+					id="navRemote"
+					data-path="/">
+				</paper-icon-button>
+				<paper-icon-button
+					icon="icons:folder"
+					on-tap="onNavTap"
+					id="navBrowse"
+					data-path="/browse">
+				</paper-icon-button>
+				<paper-icon-button
+					icon="icons:settings"
+					on-tap="onNavTap"
+					id="navRandomSettings"
+					data-path="/random-settings">
+				</paper-icon-button>
+			</paper-toolbar>
 
-					<iron-pages
-						selected="[[path]]"
-						attr-for-selected="name"
-						role="main">
+			<iron-pages
+				selected="[[path]]"
+				attr-for-selected="name"
+				role="main">
 
-						<opr-remote name="/"></opr-remote>
-						<opr-random-settings name="/random-settings"></opr-random-settings>
-						<opr-browse name="/browse"></opr-browse>
-					</iron-pages>
-				</paper-scroll-header-panel>
-			</div>
-		</paper-drawer-panel>
+				<opr-remote name="/"></opr-remote>
+				<opr-random-settings name="/random-settings"></opr-random-settings>
+				<opr-browse name="/browse"></opr-browse>
+			</iron-pages>
+		</paper-scroll-header-panel>
 	</template>
 	<script>
 		Polymer({
@@ -100,25 +88,21 @@
 			},
 
 			pathChanged: function() {
-				this.toggleClass('navSelected', ('/' === this.path), this.$.navRemote);
-				this.toggleClass('navSelected', ('/browse' === this.path), this.$.navBrowse);
-				this.toggleClass('navSelected', ('/random-settings' === this.path), this.$.navRandomSettings);
-			},
-
-			appIconTapped: function() {
+				this.$.navRemote.disabled = ('/' === this.path);
+				this.$.navBrowse.disabled = ('/browse' === this.path);
+				this.$.navRandomSettings.disabled = ('/random-settings' === this.path);
 			},
 
 			onNavTap: function(e) {
 				let target = e.target;
 
-				if ('div' !== e.target.tagName.toLowerCase()) {
+				if ('paper-icon-button' !== e.target.tagName.toLowerCase()) {
 					target = target.parentElement;
 				}
 
 				const newPath = target.getAttribute('data-path');
 
 				this.path = newPath;
-				this.$.paperDrawerPanel.closeDrawer();
 			},
 		});
 	</script>

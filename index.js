@@ -12,22 +12,37 @@ const config = require(`${__dirname}/config/config.json`),
 	_ = require('lodash'),
 	app = express();
 
+process.on('uncaughtException', function (error) {
+	logger.error('Uncaught exception!');
+	logger.error(error);
+})
+
 function errorResponse(response, error, data = null) {
 	if (error instanceof Error) {
 		error = error.message;
 	}
 
-	response.status(400).json({
-		success: false,
-		data: data,
-		error: error,
-	});
+	const jsonResponse = {
+			success: false,
+			data: data,
+			error: error,
+		},
+		logResponse = JSON.stringify(jsonResponse);
+
+	logger.error(`400 error response ${logResponse}`);
+
+	response.status(400).json(jsonResponse);
 }
 function successResponse(response, data = null) {
-	response.status(200).json({
-		success: true,
-		data: data,
-	});
+	const jsonResponse = {
+			success: true,
+			data: data,
+		},
+		logResponse = JSON.stringify(jsonResponse);
+
+	logger.debug(`200 success response ${logResponse}`);
+
+	response.status(200).json(jsonResponse);
 }
 function respond(response, error, data = null) {
 	if (error) {
@@ -57,6 +72,11 @@ _.forEach(playerConfig, (data) => {
 		player.runCommand(data.command);
 		successResponse(response);
 	});
+});
+app.get('/stop', (request, response) => {
+	playlist.stop();
+	player.runCommand('q');
+	successResponse(response);
 });
 
 // API playlist routes
@@ -159,6 +179,8 @@ app.get('/shows', (request, response) => {
 
 // Not found handler
 app.get('*', (request, response) => {
+	logger.error('404 request');
+
 	response.status(404).json({
 		'success': false,
 		'data': null,

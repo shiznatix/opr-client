@@ -1,7 +1,7 @@
 <dom-module id="opr-browse">
 	<template>
 		<style include="opr-shared-styles">
-			#browseContainer {
+			.centerContainer {
 				height: 100%;
 				@apply(--layout-vertical);
 				background-color: var(--paper-blue-grey-700);
@@ -50,9 +50,20 @@
 
 			#playEuqueueButtons {
 				@apply(--layout-horizontal);
+				height: 10vh;
+				margin-bottom: 1vh;
+				margin-top: 1vh;
 			}
 			.playEuqueueButton {
 				@apply(--layout-flex);
+			}
+
+			.centerVerticalContent .text {
+				font-size: 8vmin;
+				margin-bottom: 2vh;
+			}
+			.centerVerticalContent paper-button {
+				font-size: 8vmin;
 			}
 		</style>
 
@@ -62,9 +73,11 @@
 			id="browseAjax"
 			url="/browse-server"
 			handle-as="json"
+			debounce-duration="300"
 			method="POST"
 			content-type="application/json"
-			on-response="handleResponse">
+			on-response="browseResponseSuccess"
+			on-error="browseResponseError">
 		</iron-ajax>
 		<iron-ajax
 			id="playEuqueueAjax"
@@ -74,7 +87,7 @@
 			on-response="playEnqueueResponse">
 		</iron-ajax>
 
-		<div id="browseContainer">
+		<div class="centerContainer" id="browseContainer">
 			<div id="currentPathContainer">
 				<div id="currentPath">
 					<template is="dom-repeat" items="[[breadcrumbs]]">
@@ -110,6 +123,19 @@
 			</div>
 		</div>
 
+		<div class="centerContainer centerVertical" id="errorContainer">
+			<div class="centerVerticalContent">
+				<div class="text">
+					Unable to read from server.
+				</div>
+				<div>
+					<paper-button on-tap-"retryTapped">Retry</paper-button>
+				</div>
+			</div>
+		</div>
+
+		<opr-loading class="centerContainer centerVertical" id="loadingContainer"></opr-loading>
+
 		<opr-insert-at-dialog id="insertAtDialogElement"></opr-insert-at-dialog>
 
 		<opr-toast id="browseToast"></opr-toast>
@@ -141,11 +167,17 @@
 			selectedFiles: [],
 
 			sendRequest: function(dir) {
+				this.setVisibleLayout('loading');
 				this.attemptedFullPath = dir;
 				this.$.browseAjax.body = JSON.stringify({
 					dir: dir,
 				});
-				this.$.browseAjax.generateRequest();
+				// delay slightly so the UI doesn't shutter on fast requests
+				// maybe your UI is bad if you need to slow the user down for
+				// it to look decent...
+				setTimeout(() => {
+					this.$.browseAjax.generateRequest();
+				}, 700);
 			},
 
 			pathChanged: function() {
@@ -208,6 +240,10 @@
 				this.sendRequest(fullPath);
 			},
 
+			retryTapped: function() {
+				this.sendRequest('/');
+			},
+
 			setBreadcrumbs: function(fullPath) {
 				const parts = fullPath.split('/');
 				let breadcrumbs = [],
@@ -231,8 +267,8 @@
 				this.breadcrumbs = breadcrumbs.reverse();
 			},
 
-			handleResponse: function(event) {
-				const response = event.detail.response.data;
+			browseResponseSuccess: function() {
+				const response = this.$.browseAjax.lastResponse.data;
 
 				this.currentFullPath = this.attemptedFullPath;
 				this.selectedFiles = [];
@@ -240,6 +276,21 @@
 				localStorage.setItem('latestBrowseFullPath', this.currentFullPath);
 				this.setBreadcrumbs(this.currentFullPath);
 				this.folderContents = response;
+				this.setVisibleLayout('browse');
+			},
+
+			browseResponseError: function(event) {
+				const attemptedRoot = ('/' === this.attemptedFullPath);
+
+				// we have not gotten a good response at all yet & we didn't try to get root
+				if ('/' === this.currentFullPath && !attemptedRoot) {
+					this.sendRequest('/');
+				} else if (!attemptedRoot) {
+					this.setVisibleLayout('browse');
+					this.$.browseToast.toastMessage(`Failed to load "${this.attemptedFullPath}"`);
+				} else {
+					this.setVisibleLayout('error');
+				}
 			},
 
 			checkboxChanged: function(event) {
@@ -253,6 +304,20 @@
 				}
 
 				this.setBrowseButtonsDisabled((0 === this.selectedFiles.length));
+			},
+
+			setVisibleLayout: function(layout) {
+				this.$.loadingContainer.hidden = true;
+				this.$.browseContainer.hidden = true;
+				this.$.errorContainer.hidden = true;
+
+				if ('loading' === layout) {
+					this.$.loadingContainer.hidden = false;
+				} else if ('browse' === layout) {
+					this.$.browseContainer.hidden = false;
+				} else if ('error' === layout) {
+					this.$.errorContainer.hidden = false;
+				}
 			},
 
 			setBrowseButtonsDisabled: function(disabled) {

@@ -37,6 +37,7 @@
     "paper-scroll-header-panel": "^1.0.16",
     "paper-toolbar": "^1.1.7",
     "iron-swipeable-pages": "^1.2.6",
-    "paper-drawer-panel": "^1.0.11"
+    "paper-dialog-scrollable": "^1.1.5",
+    "paper-icon-button": "^1.1.4"
   }
 }

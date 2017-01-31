@@ -13,20 +13,23 @@
 		<paper-dialog
 			entry-animation="scale-up-animation"
 			exit-animation="fade-out-animation"
+			on-iron-overlay-opened="opened"
 			id="insertAtDialog">
 
 			<h2>Insert at</h2>
 
-			<paper-radio-group on-change="indexOnChange" id="indexRadio" attr-for-selected="value">
-				<template is="dom-repeat" items="[[ajaxResponse.data]]">
-					<paper-radio-button value="[[index]]">[[item.fileName]]</paper-radio-button>
-					<br />
-				</template>
+			<paper-dialog-scrollable>
+				<paper-radio-group on-change="indexOnChange" id="indexRadio" attr-for-selected="value">
+					<template is="dom-repeat" items="[[ajaxResponse.data]]">
+						<paper-radio-button value="[[index]]">[[item.fileName]]</paper-radio-button>
+						<br />
+					</template>
 
-				<paper-radio-button value="-1">--Enqueue--</paper-radio-button>
-			</paper-radio-group>
+					<paper-radio-button value="-1">--Enqueue--</paper-radio-button>
+				</paper-radio-group>
+			</paper-dialog-scrollable>
 
-			<div class="dialogButtons">
+			<div class="buttons">
 				<paper-button dialog-dismiss>Cancel</paper-button>
 				<paper-button dialog-confirm disabled id="insertAtButton" on-tap="insertAtPressed">Insert at</paper-button>
 			</div>
@@ -50,12 +53,19 @@
 				this.clearSelectedIndex();
 				this.$.indexRadio.hidden = true;
 				this.$.insertAtDialog.open();
+			},
+
+			opened: function() {
 				this.$.currentPlaylistAjax.generateRequest();
 			},
 
 			handleResponse: function() {
 				this.clearSelectedIndex();
 				this.$.indexRadio.hidden = false;
+
+				this.async(() => {
+					this.$.insertAtDialog.notifyResize();
+				});
 			},
 
 			indexOnChange: function(e) {

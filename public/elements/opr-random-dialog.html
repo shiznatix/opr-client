@@ -9,20 +9,22 @@
 
 			<h2>Random</h2>
 
-			<paper-radio-group selected="{{amount}}" attr-for-selected="value">
-				<paper-radio-button value="1">1</paper-radio-button>
-				<br />
-				<paper-radio-button value="2">2</paper-radio-button>
-				<br />
-				<paper-radio-button value="3">3</paper-radio-button>
-				<br />
-				<paper-radio-button value="5">5</paper-radio-button>
-				<br />
-				<paper-radio-button value="10">10</paper-radio-button>
-				<br />
-			</paper-radio-group>
+			<paper-dialog-scrollable>
+				<paper-radio-group selected="{{amount}}" attr-for-selected="value">
+					<paper-radio-button value="1">1</paper-radio-button>
+					<br />
+					<paper-radio-button value="2">2</paper-radio-button>
+					<br />
+					<paper-radio-button value="3">3</paper-radio-button>
+					<br />
+					<paper-radio-button value="5">5</paper-radio-button>
+					<br />
+					<paper-radio-button value="10">10</paper-radio-button>
+					<br />
+				</paper-radio-group>
+			</paper-dialog-scrollable>
 
-			<div class="dialogButtons">
+			<div class="buttons">
 				<paper-button dialog-dismiss>Cancel</paper-button>
 				<paper-button dialog-confirm on-tap="enqueuePressed">Enqueue</paper-button>
 				<paper-button dialog-confirm on-tap="playPressed">Play</paper-button>

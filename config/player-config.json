@@ -1,9 +1,5 @@
 [
   {
-  	"route": "close-player",
-  	"command": "q"
-  },
-  {
   	"route": "volume-down",
   	"command": "-"
   },

@@ -1,11 +1,18 @@
 <dom-module id="opr-random-settings">
 	<template>
 		<style include="opr-shared-styles">
+			opr-loading {
+				height: 100%;
+				@apply(--layout-vertical);
+			}
 			.showlistContainer {
 				background-color: var(--paper-blue-grey-700);
 				margin: 0.5vmin;
 				border-radius: 2vmin;
 				padding: 1vmin;
+			}
+			.text {
+				font-size: 7vmin;
 			}
 		</style>
 
@@ -15,7 +22,9 @@
 			id="randomSettingsAjax"
 			url="/shows"
 			handle-as="json"
-			last-response="{{ajaxResponse}}">
+			last-response="{{ajaxResponse}}"
+			on-response="responseSuccess"
+			on-error="responseError">
 		</iron-ajax>
 
 		<iron-accordions id="showCategoryAccordions">
@@ -33,6 +42,19 @@
 				</iron-accordion>
 			</template>
 		</iron-accordions>
+
+		<opr-loading class="centerContainer centerVertical" id="loadingContainer"></opr-loading>
+
+		<div class="centerContainer centerVertical" id="errorContainer">
+			<div class="centerVerticalContent">
+				<div class="text">
+					Could not load show categories
+				</div>
+				<div>
+					<paper-button on-tap="reload">Retry</paper-button>
+				</div>
+			</div>
+		</div>
 	</template>
 	<script>
 		Polymer({
@@ -57,13 +79,40 @@
 				try {
 					this.savedShowNames = JSON.parse(localStorage.getItem('randomShows'));
 				} catch (e) {
+					this.savedShowNames = [];
 				}
 
+				// ensure the parsed JSON is an array
 				this.savedShowNames = (Array.isArray(this.savedShowNames) ? this.savedShowNames : []);
 			},
 
 			reload: function() {
-				this.$.randomSettingsAjax.generateRequest();
+				this.setVisibleLayout('loading');
+				setTimeout(() => {
+					this.$.randomSettingsAjax.generateRequest();
+				}, 700);
+			},
+
+			responseSuccess: function() {
+				this.setVisibleLayout('categories');
+			},
+
+			responseError: function() {
+				this.setVisibleLayout('error');
+			},
+
+			setVisibleLayout: function(layout) {
+				this.$.loadingContainer.hidden = true;
+				this.$.showCategoryAccordions.hidden = true;
+				this.$.errorContainer.hidden = true;
+
+				if ('loading' === layout) {
+					this.$.loadingContainer.hidden = false;
+				} else if ('categories' === layout) {
+					this.$.showCategoryAccordions.hidden = false;
+				} else if ('error' === layout) {
+					this.$.errorContainer.hidden = false;
+				}
 			},
 
 			checkboxChecked: function(showName) {
