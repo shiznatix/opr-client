@@ -5,6 +5,10 @@
     "mkv",
     "mpg",
     "mpeg",
-    "avi"
+    "avi",
+    "mp4",
+    "wmv",
+    "ogg",
+    "ogv"
   ]
 }
