@@ -7,6 +7,12 @@ Create install script
 	install:
 		- npm install
 		- cd public && bower install && cd ..
+		- add to init.d the start/stop script
+		- where should it install to?
+
+Init script should be fixed
+	- Stop seems to kill all node scripts, not just the one we are killing
+	- Check if it allows start to be run even if another process exists
 
 Should we have in config the folder mappings from server to client for random plays? This should be configurable somewhat.
 	- Remove mount bash file
@@ -15,3 +21,5 @@ Should we have in config the folder mappings from server to client for random pl
 Styles:
 	- Browse page is different from all other pages. Make browse page normal
 	- When random-settings ajax fails, an error message is displayed. Get vertical centering to work with this
+
+Set file permissions to new files that were made from Mac. Seem to have +x or other chmod stuff
