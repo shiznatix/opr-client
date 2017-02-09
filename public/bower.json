@@ -39,5 +39,8 @@
     "iron-swipeable-pages": "^1.2.6",
     "paper-dialog-scrollable": "^1.1.5",
     "paper-icon-button": "^1.1.4"
+  },
+  "resolutions": {
+    "iron-selector": "^1.4.0"
   }
 }

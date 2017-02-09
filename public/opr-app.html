@@ -43,7 +43,7 @@
 					id="appIcon">
 				</iron-icon>
 
-				<span class="title">OMX Remote</span>
+				<span class="title">[[title]]</span>
 
 				<paper-icon-button
 					icon="icons:settings-remote"
@@ -85,6 +85,27 @@
 					type: String,
 					observer: 'pathChanged',
 				},
+				title: {
+					type: String,
+					value: 'OMX Remote',
+				},
+			},
+
+			ready: function() {
+				let domain = window.location.hostname.toUpperCase(),
+					domainPieces = domain.split('.');
+
+				if (!Array.isArray(domainPieces) || 1 === domainPieces.length) {
+					this.title = domain;
+				} else {
+					let titleArray = [];
+
+					for (let i = 0; i < (domainPieces.length - 1); i++) {
+						titleArray.push(domainPieces[i]);
+					}
+
+					this.title = titleArray.join('.');
+				}
 			},
 
 			pathChanged: function() {
