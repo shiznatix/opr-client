@@ -11,10 +11,11 @@
 
 			toastFromPlaylistEvent: function(e) {
 				const response = e.detail.response;
+				let text = null;
 
 				if (!response.success) {
-					this.$.toast.text = response.error;
-				} else {
+					text = response.error;
+				} else if (response.data) {
 					const data = (Array.isArray(response.data) ? response.data : [response.data]);
 					let toastMessages = [];
 
@@ -27,7 +28,10 @@
 					this.$.toast.text = toastMessages;
 				}
 
-				this.$.toast.open();
+				if (text) {
+					this.$.toast.text = text;
+					this.$.toast.open();
+				}
 			},
 
 			toastMessage: function(message) {

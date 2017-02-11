@@ -21,3 +21,6 @@ Browse page:
 	- long file names break the view. maybe this happens on other views too like random settings?
 
 In config, allow setting the default volume on first play
+
+Remote page:
+	- remove swipe action, just switch pages when the circles on the bottom are pressed

@@ -61,11 +61,16 @@
 			is: 'opr-random-settings',
 
 			savedShowNames: [],
+			selectedShowNames: [],
 
 			properties: {
 				path: {
 					type: String,
 					observer: 'pathChanged',
+				},
+				useSavedSettings: {
+					type: Boolean,
+					value: false,
 				},
 			},
 
@@ -88,9 +93,8 @@
 
 			reload: function() {
 				this.setVisibleLayout('loading');
-				setTimeout(() => {
-					this.$.randomSettingsAjax.generateRequest();
-				}, 700);
+
+				this.$.randomSettingsAjax.generateRequest();
 			},
 
 			responseSuccess: function() {
@@ -116,6 +120,10 @@
 			},
 
 			checkboxChecked: function(showName) {
+				if (!this.useSavedSettings) {
+					return '';
+				}
+
 				return (this.savedShowNames.indexOf(showName) > -1 ? 'checked' : '');
 			},
 
@@ -123,6 +131,13 @@
 				const showName = event.target.value,
 					checked = event.target.checked,
 					index = this.savedShowNames.indexOf(showName);
+
+				if (!this.useSavedSettings) {
+					return;
+				}
+
+				// TODO: if it is checked, add it to the array. if it is not checked, pop it out
+				//this.selectedShowNames.
 
 				if (!checked && index > -1) {
 					this.savedShowNames.splice(index, 1);
