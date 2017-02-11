@@ -1,6 +1,7 @@
 {
   "port": 9091,
   "serverHost": "http://localhost:9090",
+  "defaultVolume": 0,
   "playableExtensions": [
     "mkv",
     "mpg",
@@ -9,6 +10,7 @@
     "mp4",
     "wmv",
     "ogg",
-    "ogv"
+    "ogv",
+    "ogm"
   ]
 }

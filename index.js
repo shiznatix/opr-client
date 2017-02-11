@@ -106,34 +106,58 @@ app.get('/current-playlist', (request, response) => {
 	successResponse(response, playlist.get());
 });
 app.post('/set-playlist', (request, response) => {
+	let addedFilePaths = [];
+
 	validator.setPlaylist(request.body).then((params) => {
-		return playlist.set(params.filePaths);
+		addedFilePaths = params.filePaths;
+
+		return playlist.set(addedFilePaths);
 	}).then(() => {
 		playlist.playAt(0);
 		successResponse(response, playlist.get());
 	}).catch((error) => {
 		logger.error(error);
 		errorResponse(response, error);
+	}).then(() => {
+		return server.setLastPlayedTime(addedFilePaths);
+	}).catch((error) => {
+		logger.error(error);
 	});
 });
 app.post('/enqueue-playlist', (request, response) => {
+	let addedFilePaths = [];
+
 	validator.setPlaylist(request.body).then((params) => {
-		return playlist.enqueue(params.filePaths);
+		addedFilePaths = params.filePaths;
+
+		return playlist.enqueue(addedFilePaths);
 	}).then(() => {
 		successResponse(response, playlist.get());
 	}).catch((error) => {
 		logger.error(error);
 		errorResponse(response, error);
+	}).then(() => {
+		return server.setLastPlayedTime(addedFilePaths);
+	}).catch((error) => {
+		logger.error(error);
 	});
 });
 app.post('/set-at-playlist', (request, response) => {
+	let addedFilePaths = [];
+
 	validator.setAtPlaylist(request.body).then((params) => {
-		return playlist.setAt(params.filePaths, params.atIndex);
+		addedFilePaths = params.filePaths;
+
+		return playlist.setAt(addedFilePaths, params.atIndex);
 	}).then(() => {
 		successResponse(response, playlist.get());
 	}).catch((error) => {
 		logger.error(error);
 		errorResponse(response, error);
+	}).then(() => {
+		return server.setLastPlayedTime(addedFilePaths);
+	}).catch((error) => {
+		logger.error(error);
 	});
 });
 app.get('/previous', (request, response) => {
@@ -163,7 +187,7 @@ app.post('/random', (request, response) => {
 		let filePaths = [];
 
 		_.forEach(data, (show) => {
-			filePaths.push(show.path);
+			filePaths.push(show.filePath);
 		});
 
 		if ('enqueue' === params.method) {
