@@ -35,7 +35,7 @@
 					<div class="showlistContainer">
 						<template is="dom-repeat" items="[[item.shows]]">
 							<div class="listEntry">
-								<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="{{checkboxChecked(item)}}">[[item]]</paper-checkbox>
+								<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="[[checkboxChecked(item, selectedShowNames)]]">[[item]]</paper-checkbox>
 							</div>
 						</template>
 					</div>
@@ -60,9 +60,6 @@
 		Polymer({
 			is: 'opr-random-settings',
 
-			savedShowNames: [],
-			selectedShowNames: [],
-
 			properties: {
 				path: {
 					type: String,
@@ -71,6 +68,10 @@
 				useSavedSettings: {
 					type: Boolean,
 					value: false,
+				},
+				selectedShowNames: {
+					type: Array,
+					value: [],
 				},
 			},
 
@@ -81,14 +82,19 @@
 			},
 
 			ready: function() {
+				// only set if we care about saving the shows
+				if (!this.useSavedSettings) {
+					return;
+				}
+
 				try {
-					this.savedShowNames = JSON.parse(localStorage.getItem('randomShows'));
+					this.selectedShowNames = JSON.parse(localStorage.getItem('randomShows'));
 				} catch (e) {
-					this.savedShowNames = [];
+					this.selectedShowNames = [];
 				}
 
 				// ensure the parsed JSON is an array
-				this.savedShowNames = (Array.isArray(this.savedShowNames) ? this.savedShowNames : []);
+				this.setSelectedShowNames((Array.isArray(this.selectedShowNames) ? this.selectedShowNames : []));
 			},
 
 			reload: function() {
@@ -120,32 +126,32 @@
 			},
 
 			checkboxChecked: function(showName) {
-				if (!this.useSavedSettings) {
-					return '';
-				}
-
-				return (this.savedShowNames.indexOf(showName) > -1 ? 'checked' : '');
+				//console.log(showName);
+				return (this.selectedShowNames.indexOf(showName) > -1 ? 'checked' : '');
 			},
 
 			checkboxChanged: function(event) {
 				const showName = event.target.value,
 					checked = event.target.checked,
-					index = this.savedShowNames.indexOf(showName);
-
-				if (!this.useSavedSettings) {
-					return;
-				}
-
-				// TODO: if it is checked, add it to the array. if it is not checked, pop it out
-				//this.selectedShowNames.
+					index = this.selectedShowNames.indexOf(showName);
 
 				if (!checked && index > -1) {
-					this.savedShowNames.splice(index, 1);
-					localStorage.setItem('randomShows', JSON.stringify(this.savedShowNames));
+					this.selectedShowNames.splice(index, 1);
 				} else if (checked && -1 === index) {
-					this.savedShowNames.push(showName);
-					localStorage.setItem('randomShows', JSON.stringify(this.savedShowNames));
+					this.selectedShowNames.push(showName);
 				}
+
+				if (this.useSavedSettings) {
+					localStorage.setItem('randomShows', JSON.stringify(this.selectedShowNames));
+				}
+			},
+
+			getSelectedShowNames: function() {
+				return this.selectedShowNames;
+			},
+
+			setSelectedShowNames: function(selectedShowNames) {
+				this.selectedShowNames = selectedShowNames;
 			},
 		});
 	</script>
