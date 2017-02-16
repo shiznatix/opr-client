@@ -15,16 +15,20 @@
 				background-color: var(--paper-blue-900);
 			}
 
-			#appIcon {
-				--iron-icon-fill-color: var(--paper-blue-900);
-				--iron-icon-stroke-color: var(--paper-blue-200);
+			.hostname {
+				font-size: 6vmin;
+				padding-right: 2vmin;
 			}
 
+			#navButtons {
+				@apply(--layout-horizontal);
+				@apply(--layout-flex);
+			}
 			paper-button {
+				@apply(--layout-flex);
 				background-color: var(--paper-blue-800);
 				color: var(--paper-blue-200);
-				font-size: 4vmin;
-				height: 90%;
+				font-size: 3vmin;
 			}
 			paper-button.disabled {
 				background-color: var(--paper-blue-200);
@@ -40,16 +44,21 @@
 
 		<paper-scroll-header-panel fixed>
 			<paper-toolbar>
-				<iron-icon
-					icon="notification:ondemand-video"
-					id="appIcon">
-				</iron-icon>
+				<div>
+					<span class="hostname">[[title]]</span>
+				</div>
 
-				<span class="title">[[title]]</span>
-
-				<paper-button on-tap="onNavTap" data-path="/" class="navButton">Remote</paper-button>
-				<paper-button on-tap="onNavTap" data-path="/browse" class="navButton">Browse</paper-button>
-				<paper-button on-tap="onNavTap" data-path="/random-settings" class="navButton">Settings</paper-button>
+				<div id="navButtons">
+					<paper-button on-tap="onNavTap" data-path="/" class="navButton">
+						Remote
+					</paper-button>
+					<paper-button on-tap="onNavTap" data-path="/browse" class="navButton">
+						Browse
+					</paper-button>
+					<paper-button on-tap="onNavTap" data-path="/random-settings" class="navButton">
+						Settings
+					</paper-button>
+				</div>
 			</paper-toolbar>
 
 			<iron-pages
