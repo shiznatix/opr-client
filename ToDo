@@ -4,6 +4,10 @@ Create install script
 		- node 6 or greater
 		- sshfs (maybe, if client and server is not local)
 
+Git hooks:
+	- On commit this should be run and auto-added if changed:
+		vulcanize -p ./ elements/elements.html -o elements/elements.vulcanized.html
+
 Init script should be fixed
 	- Log file will grow too large
 
