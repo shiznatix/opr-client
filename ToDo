@@ -19,8 +19,7 @@ Browse page:
 	- allow sorting the list by title or update time asc / desc
 	- add side bar alphabet for fast scrolling in movies folder
 	- long file names break the view. maybe this happens on other views too like random settings?
-
-In config, allow setting the default volume on first play
+	- going from a small list to a big one doesnt seem to trigger view change
 
 Remote page:
 	- remove swipe action, just switch pages when the circles on the bottom are pressed

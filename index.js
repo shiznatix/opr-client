@@ -10,6 +10,7 @@ const config = require(`${__dirname}/config/config.json`),
 	validator = require(`${__dirname}/lib/validator.js`),
 	logger = require(`${__dirname}/lib/logger.js`),
 	_ = require('lodash'),
+	os = require('os'),
 	app = express();
 let appServer = null;
 
@@ -81,6 +82,29 @@ app.use(bodyParser.urlencoded({
 
 // Public files
 app.use(express.static(`${__dirname}/public`));
+// Android manifest
+app.get('/manifest.json', (request, response) => {
+	const hostname = os.hostname().toUpperCase();
+
+	response.status(200).json({
+		short_name: hostname,
+		name: `OPR ${hostname}`,
+		scope: './',
+		start_url: '/',
+		display: 'standalone',
+		orientation: 'portrait',
+		theme_color: '#000000',
+		background_color: '#000000',
+		icons: [
+			{
+				src: 'launcher-icon-96.png',
+				sizes: '96x96',
+				type: 'image/png',
+			},
+		],
+
+	});
+});
 app.get('/random-settings', (request, response) => {
 	response.sendFile(`${__dirname}/public/index.html`);
 });

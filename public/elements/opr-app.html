@@ -1,5 +1,3 @@
-<link rel="import" href="/elements/opr-elements.html">
-
 <dom-module id="opr-app">
 	<template>
 		<style include="opr-shared-styles">
@@ -22,10 +20,14 @@
 				--iron-icon-stroke-color: var(--paper-blue-200);
 			}
 
-			paper-icon-button {
+			paper-button {
+				background-color: var(--paper-blue-800);
 				color: var(--paper-blue-200);
+				font-size: 4vmin;
+				height: 90%;
 			}
-			paper-icon-button[disabled] {
+			paper-button.disabled {
+				background-color: var(--paper-blue-200);
 				color: var(--paper-blue-800);
 			}
 
@@ -45,24 +47,9 @@
 
 				<span class="title">[[title]]</span>
 
-				<paper-icon-button
-					icon="icons:settings-remote"
-					on-tap="onNavTap"
-					id="navRemote"
-					data-path="/">
-				</paper-icon-button>
-				<paper-icon-button
-					icon="icons:folder"
-					on-tap="onNavTap"
-					id="navBrowse"
-					data-path="/browse">
-				</paper-icon-button>
-				<paper-icon-button
-					icon="icons:settings"
-					on-tap="onNavTap"
-					id="navRandomSettings"
-					data-path="/random-settings">
-				</paper-icon-button>
+				<paper-button on-tap="onNavTap" data-path="/" class="navButton">Remote</paper-button>
+				<paper-button on-tap="onNavTap" data-path="/browse" class="navButton">Browse</paper-button>
+				<paper-button on-tap="onNavTap" data-path="/random-settings" class="navButton">Settings</paper-button>
 			</paper-toolbar>
 
 			<iron-pages
@@ -109,19 +96,18 @@
 			},
 
 			pathChanged: function() {
-				this.$.navRemote.disabled = ('/' === this.path);
-				this.$.navBrowse.disabled = ('/browse' === this.path);
-				this.$.navRandomSettings.disabled = ('/random-settings' === this.path);
+				const navButtons = document.querySelectorAll('.navButton');
+				for (let i = 0; i < navButtons.length; i++) {
+					if (navButtons[i].getAttribute('data-path') === this.path) {
+						navButtons[i].classList.add('disabled');
+					} else {
+						navButtons[i].classList.remove('disabled');
+					}
+				}
 			},
 
 			onNavTap: function(e) {
-				let target = e.target;
-
-				if ('paper-icon-button' !== e.target.tagName.toLowerCase()) {
-					target = target.parentElement;
-				}
-
-				const newPath = target.getAttribute('data-path');
+				const newPath = e.target.getAttribute('data-path');
 
 				this.path = newPath;
 			},

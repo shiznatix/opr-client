@@ -1,9 +1,0 @@
-{
-  "name": "OPR Remote",
-  "scope": "./",
-  "start_url": "index.html",
-  "display": "standalone",
-  "orientation": "any",
-  "theme_color": "#9C27B0",
-  "background_color": "#9C27B0"
-}
