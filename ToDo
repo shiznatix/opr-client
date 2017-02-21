@@ -27,3 +27,6 @@ Browse page:
 
 Remote page:
 	- remove swipe action, just switch pages when the circles on the bottom are pressed
+
+Random:
+	- Fix random to only select 1 show and weight on last played time

@@ -95,8 +95,10 @@
 					</template>
 					<paper-button on-tap="onBreadcrumTapped" class="breadcrumb">/</paper-button>
 				</div>
-				<div on-tap="onBackTap" id="backButton">
-					<paper-button><iron-icon icon="icons:reply"></iron-icon>Back</paper-button>
+				<div>
+					<paper-button on-tap="onBackTap" id="backButton">
+						<iron-icon icon="icons:reply"></iron-icon>Back
+					</paper-button>
 				</div>
 			</div>
 
@@ -172,12 +174,7 @@
 				this.$.browseAjax.body = JSON.stringify({
 					dir: dir,
 				});
-				// delay slightly so the UI doesn't shutter on fast requests
-				// maybe your UI is bad if you need to slow the user down for
-				// it to look decent...
-				setTimeout(() => {
-					this.$.browseAjax.generateRequest();
-				}, 700);
+				this.$.browseAjax.generateRequest();
 			},
 
 			pathChanged: function() {

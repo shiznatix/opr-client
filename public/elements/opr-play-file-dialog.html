@@ -1,6 +1,15 @@
 <dom-module id="opr-play-file-dialog">
 	<template>
-		<style include="opr-shared-styles"></style>
+		<style include="opr-shared-styles">
+			paper-radio-button {
+				width: 100%;
+			}
+
+			.showName {
+				font-size: 2vmin;
+				color: var(--paper-blue-grey-400);
+			}
+		</style>
 
 		<iron-ajax
 			id="currentPlaylistAjax"
@@ -25,7 +34,14 @@
 
 				<paper-radio-group on-change="indexOnChange" id="indexRadio" attr-for-selected="value">
 					<template is="dom-repeat" items="[[ajaxResponse.data]]">
-						<paper-radio-button value="[[index]]">[[item.fileName]]</paper-radio-button>
+						<paper-radio-button value="[[index]]">
+							<div class="fileName">
+								[[item.fileName]]
+							</div>
+							<div class="showName">
+								[[item.showName]]
+							</div>
+						</paper-radio-button>
 						<br />
 					</template>
 				</paper-radio-group>
