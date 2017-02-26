@@ -5,19 +5,19 @@
 			}
 
 			:root {
-				--opr-color-100: var(--paper-blue-grey-100);
-				--opr-color-200: var(--paper-blue-grey-200);
-				--opr-color-300: var(--paper-blue-grey-300);
-				--opr-color-400: var(--paper-blue-grey-400);
-				--opr-color-500: var(--paper-blue-grey-500);
-				--opr-color-600: var(--paper-blue-grey-600);
-				--opr-color-700: var(--paper-blue-grey-700);
-				--opr-color-800: var(--paper-blue-grey-800);
-				--opr-color-900: var(--paper-blue-grey-900);
+				--opr-color-100: %OPR_COLOR_100%;
+				--opr-color-200: %OPR_COLOR_200%;
+				--opr-color-300: %OPR_COLOR_300%;
+				--opr-color-400: %OPR_COLOR_400%;
+				--opr-color-500: %OPR_COLOR_500%;
+				--opr-color-600: %OPR_COLOR_600%;
+				--opr-color-700: %OPR_COLOR_700%;
+				--opr-color-800: %OPR_COLOR_800%;
+				--opr-color-900: %OPR_COLOR_900%;
 
-				--opr-color-2-200: var(--paper-blue-200);
-				--opr-color-2-800: var(--paper-blue-800);
-				--opr-color-2-900: var(--paper-blue-900);
+				--opr-color-2-200: %OPR_COLOR_2_200%;
+				--opr-color-2-800: %OPR_COLOR_2_800%;
+				--opr-color-2-900: %OPR_COLOR_2_900%;
 			}
 
 			paper-dialog {

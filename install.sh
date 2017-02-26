@@ -6,11 +6,13 @@
 # 2) Have a user called pi
 # 3) Have node > 6 installed
 # 4) Have npm installed
+# 5) Have jq installed
 ####
 
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
-  exit
+then
+	echo "Please run as root"
+	exit
 fi
 
 echo "Installing Omxplayer Remote - Client..."
@@ -24,8 +26,21 @@ echo "Bower install..."
 sudo -u pi ../node_modules/bower/bin/bower install --force-latest
 cd ..
 
-INIT_SCRIPT_TEMPLAT=`cat opr-client.template`
-INIT_SCRIPT="${INIT_SCRIPT_TEMPLAT/\%INSTALL_PATH\%/$PWD}"
+printf "Creating config file... "
+if [ ! -f config/config.json ]
+then
+	sudo -u pi cp config/config.example.json config/config.json
+	echo "Default config file created"
+else
+	echo "Config file already existed"
+fi
+
+
+echo "Creating theme file..."
+sudo -u pi ./build-theme.sh
+
+INIT_SCRIPT_TEMPLATE=`cat opr-client.template`
+INIT_SCRIPT="${INIT_SCRIPT_TEMPLATE/\%INSTALL_PATH\%/$PWD}"
 
 echo "Copy init script..."
 echo "$INIT_SCRIPT" > "/etc/init.d/opr-client"

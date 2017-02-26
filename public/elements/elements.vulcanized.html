@@ -24672,29 +24672,45 @@ Configuration:
 			@media (min-width: 640px) {
 			}
 
+			:root {
+				--opr-color-100: var(--paper-blue-grey-100);
+				--opr-color-200: var(--paper-blue-grey-200);
+				--opr-color-300: var(--paper-blue-grey-300);
+				--opr-color-400: var(--paper-blue-grey-400);
+				--opr-color-500: var(--paper-blue-grey-500);
+				--opr-color-600: var(--paper-blue-grey-600);
+				--opr-color-700: var(--paper-blue-grey-700);
+				--opr-color-800: var(--paper-blue-grey-800);
+				--opr-color-900: var(--paper-blue-grey-900);
+
+				--opr-color-2-200: var(--paper-blue-200);
+				--opr-color-2-800: var(--paper-blue-800);
+				--opr-color-2-900: var(--paper-blue-900);
+			}
+
 			paper-dialog {
-				background-color: var(--paper-blue-grey-900);
-				color: var(--paper-blue-grey-200);
+				background-color: var(--opr-color-900);
+				color: var(--opr-color-200);
 			}
 
 			paper-radio-button {
-				--paper-radio-button-label-color: var(--paper-blue-grey-200);
-				--paper-radio-button-unchecked-background-color: var(--paper-blue-grey-800);
-				--paper-radio-button-unchecked-color: var(--paper-blue-grey-700);
-				--paper-radio-button-checked-color: var(--paper-blue-grey-200);
+				--paper-radio-button-label-color: var(--opr-color-200);
+				--paper-radio-button-unchecked-background-color: var(--opr-color-800);
+				--paper-radio-button-unchecked-color: var(--opr-color-700);
+				--paper-radio-button-checked-color: var(--opr-color-200);
 				--paper-radio-button-size: 7vmin;
 				font-size: 3vmin;
 			}
 
 			paper-button {
-				background-color: var(--paper-blue-grey-800);
-				color: var(--paper-blue-grey-200);
+				background-color: var(--opr-color-800);
+				color: var(--opr-color-200);
 				font-weight: bold;
 				font-size: 4vmin;
 			}
 
 			iron-accordion {
-				background-color: var(--paper-blue-grey-800);
+				background-color: var(--opr-color-800);
 				margin: 10px;
 				padding-left: 5px;
 				padding-right: 5px;
@@ -24703,17 +24719,17 @@ Configuration:
 			}
 
 			iron-icon {
-				--iron-icon-fill-color: var(--paper-blue-grey-300);
-				--iron-icon-stroke-color: var(--paper-blue-grey-200);
+				--iron-icon-fill-color: var(--opr-color-300);
+				--iron-icon-stroke-color: var(--opr-color-200);
 				--iron-icon-height: 8vmin;
 				--iron-icon-width: 8vmin;
 			}
 
 			paper-checkbox {
-				--paper-checkbox-label-color: var(--paper-blue-grey-200);
-				--paper-checkbox-unchecked-background-color: var(--paper-blue-grey-300);
-				--paper-checkbox-unchecked-color: var(--paper-blue-grey-200);
-				--paper-checkbox-checked-color: var(--paper-blue-grey-200);
+				--paper-checkbox-label-color: var(--opr-color-200);
+				--paper-checkbox-unchecked-background-color: var(--opr-color-300);
+				--paper-checkbox-unchecked-color: var(--opr-color-200);
+				--paper-checkbox-checked-color: var(--opr-color-200);
 				--paper-checkbox-label-spacing: 1vmin;
 				--paper-checkbox-size: 6vmin;
 				--paper-checkbox-margin: 1vmin;
@@ -24721,14 +24737,14 @@ Configuration:
 			}
 
 			h2 {
-				color: var(--paper-blue-grey-200);
+				color: var(--opr-color-200);
 				font-size: 6vmin;
 				height: 7vmin;
 				line-height: 7vmin;
 			}
 
 			.text {
-				color: var(--paper-blue-grey-200);
+				color: var(--opr-color-200);
 			}
 			.centerText {
 				text-align: center;
@@ -24744,7 +24760,7 @@ Configuration:
 			}
 
 			.dialogButtons paper-button {
-				background-color: var(--paper-blue-grey-900);
+				background-color: var(--opr-color-900);
 				font-size: 3vmin;
 			}
 
@@ -24759,11 +24775,12 @@ Configuration:
 				bottom: 0px;
 				left: 3%;
 				width: 94%;
-				border-bottom: 1px solid var(--paper-blue-grey-900);
+				border-bottom: 1px solid var(--opr-color-900);
 			}
 		</style>
 	</template>
-</dom-module><dom-module id="opr-app" assetpath="/elements/">
+</dom-module>
+<dom-module id="opr-app" assetpath="/elements/">
 	<template>
 		<style include="opr-shared-styles">
 			paper-scroll-header-panel {
@@ -24772,12 +24789,12 @@ Configuration:
 				right: 0;
 				bottom: 0;
 				left: 0;
-				background-color: var(--paper-blue-grey-900);
+				background-color: var(--opr-color-900);
 			}
 
 			paper-toolbar {
-				color: var(--paper-blue-200);
-				background-color: var(--paper-blue-900);
+				color: var(--opr-color-2-200);
+				background-color: var(--opr-color-2-900);
 			}
 
 			.hostname {
@@ -24791,13 +24808,13 @@ Configuration:
 			}
 			paper-button {
 				@apply(--layout-flex);
-				background-color: var(--paper-blue-800);
-				color: var(--paper-blue-200);
+				background-color: var(--opr-color-2-800);
+				color: var(--opr-color-2-200);
 				font-size: 3vmin;
 			}
 			paper-button.disabled {
-				background-color: var(--paper-blue-200);
-				color: var(--paper-blue-800);
+				background-color: var(--opr-color-2-200);
+				color: var(--opr-color-2-800);
 			}
 
 			iron-pages {
@@ -25191,7 +25208,7 @@ Configuration:
 
 			.showName {
 				font-size: 2vmin;
-				color: var(--paper-blue-grey-400);
+				color: var(--opr-color-400);
 			}
 		</style>
 
@@ -25364,7 +25381,7 @@ Configuration:
 				@apply(--layout-vertical);
 			}
 			.showlistContainer {
-				background-color: var(--paper-blue-grey-700);
+				background-color: var(--opr-color-700);
 				margin: 0.5vmin;
 				border-radius: 2vmin;
 				padding: 1vmin;
@@ -25555,13 +25572,13 @@ Configuration:
 			.centerContainer {
 				height: 100%;
 				@apply(--layout-vertical);
-				background-color: var(--paper-blue-grey-700);
+				background-color: var(--opr-color-700);
 			}
 
 			#currentPathContainer {
 				@apply(--layout-horizontal);
-				background-color: var(--paper-blue-grey-200);
-				color: var(--paper-blue-grey-900);
+				background-color: var(--opr-color-200);
+				color: var(--opr-color-900);
 				align-items: center;
 				height: 10vmin;
 			}
