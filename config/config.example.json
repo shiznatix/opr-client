@@ -1,6 +1,9 @@
 {
   "theme": {
+    "icon": "launcher-icon-96.png",
+
     "baseColor": "#000000",
+
     "color100": "var(--paper-blue-grey-100)",
     "color200": "var(--paper-blue-grey-200)",
     "color300": "var(--paper-blue-grey-300)",

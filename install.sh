@@ -90,4 +90,7 @@ touch /var/log/opr/client.log
 echo "Registering at startup..."
 update-rc.d opr-client defaults
 
+echo "Starting client..."
+service opr-client start
+
 echo "Installation complete!"

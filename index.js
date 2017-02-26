@@ -100,7 +100,7 @@ app.get('/manifest.json', (request, response) => {
 		background_color: config.theme.baseColor,
 		icons: [
 			{
-				src: 'launcher-icon-96.png',
+				src: config.theme.icon,
 				sizes: '96x96',
 				type: 'image/png',
 			},
