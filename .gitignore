@@ -39,5 +39,7 @@ jspm_packages
 bower_components
 playlist.txt
 config.json
+elements.vulcanized.html
+shared-styles.html
 .DS_Store
 ._*
