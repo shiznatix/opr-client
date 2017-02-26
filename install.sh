@@ -45,6 +45,12 @@ then
 	exit 1
 fi
 
+if ! command_exists omxplayer
+then
+	echo "Please install omxplayer"
+	exit 1
+fi
+
 PI_USER_CHECK=`grep -c '^pi:' /etc/passwd`
 
 if [ "$PI_USER_CHECK" -eq "0" ]
@@ -54,6 +60,7 @@ then
 fi
 
 echo "Installing Omxplayer Remote - Client..."
+exit
 
 cd "$(dirname "$0")"
 
