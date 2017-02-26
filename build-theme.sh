@@ -6,6 +6,8 @@ then
 	exit 1
 fi
 
+cd "$(dirname "$0")"
+
 function getColor {
 	CMD="cat config/config.json | jq -r '.theme.$1'"
 	echo `eval $CMD`
@@ -46,3 +48,6 @@ cd public
 
 echo "Vulcanize..."
 ../node_modules/vulcanize/bin/vulcanize -p ./ elements/elements.html -o elements/elements.vulcanized.html
+
+echo "Theme built!"
+

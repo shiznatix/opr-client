@@ -1,17 +1,17 @@
-const config = require(`${__dirname}/config/config.json`),
-	playerConfig = require(`${__dirname}/config/player-config.json`),
+const config = require('./config/config.json'),
+	playerConfig = require('./config/player-config.json'),
 	express = require('express'),
 	bodyParser = require('body-parser'),
-	player = require(`${__dirname}/lib/player.js`),
-	Playlist = require(`${__dirname}/lib/playlist.js`),
+	player = require('./lib/player.js'),
+	Playlist = require('./lib/playlist.js'),
 	playlist = new Playlist(player),
-	server = require(`${__dirname}/lib/server.js`),
-	browse = require(`${__dirname}/lib/browse.js`),
-	validator = require(`${__dirname}/lib/validator.js`),
-	logger = require(`${__dirname}/lib/logger.js`),
+	server = require('./lib/server.js'),
+	browse = require('./lib/browse.js'),
+	validator = require('./lib/validator.js'),
+	logger = require('./lib/logger.js'),
+	themeWatcher = require('./lib/theme-watcher.js'),
 	_ = require('lodash'),
 	os = require('os'),
-	fs = require('fs'),
 	app = express();
 let appServer = null;
 
@@ -40,6 +40,8 @@ process.on('SIGTERM', () => {
 		process.exit(0);
 	});
 });
+
+themeWatcher.start();
 
 function errorResponse(response, error, data = null) {
 	if (error instanceof Error) {
@@ -106,31 +108,6 @@ app.get('/manifest.json', (request, response) => {
 
 	});
 });
-/*app.get('/shared-styles.html', (request, response) => {
-	fs.readFile('./public/shared-styles-template.html', (error, data) => {
-		if (error) {
-			response.status(400).send('Error reading shared-styles.html');
-			return;
-		}
-
-		data = data.toString()
-			.replace('%OPR_COLOR_100%', config.theme.color100)
-			.replace('%OPR_COLOR_200%', config.theme.color200)
-			.replace('%OPR_COLOR_300%', config.theme.color300)
-			.replace('%OPR_COLOR_400%', config.theme.color400)
-			.replace('%OPR_COLOR_500%', config.theme.color500)
-			.replace('%OPR_COLOR_600%', config.theme.color600)
-			.replace('%OPR_COLOR_700%', config.theme.color700)
-			.replace('%OPR_COLOR_800%', config.theme.color800)
-			.replace('%OPR_COLOR_900%', config.theme.color900)
-
-			.replace('%OPR_COLOR_2_200%', config.theme.secondaryColor200)
-			.replace('%OPR_COLOR_2_800%', config.theme.secondaryColor800)
-			.replace('%OPR_COLOR_2_900%', config.theme.secondaryColor900);
-
-		response.status(200).send(data);
-	});
-});*/
 app.get('/random-settings', (request, response) => {
 	response.sendFile(`${__dirname}/public/index.html`);
 });
