@@ -1,0 +1,125 @@
+<dom-module id="opr-app">
+	<template>
+		<style include="opr-shared-styles">
+			paper-scroll-header-panel {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				background-color: var(--opr-color-900);
+			}
+
+			paper-toolbar {
+				color: var(--opr-color-2-200);
+				background-color: var(--opr-color-2-900);
+			}
+
+			.hostname {
+				font-size: 6vmin;
+				padding-right: 2vmin;
+			}
+
+			#navButtons {
+				@apply(--layout-horizontal);
+				@apply(--layout-flex);
+			}
+			paper-button {
+				@apply(--layout-flex);
+				background-color: var(--opr-color-2-800);
+				color: var(--opr-color-2-200);
+				font-size: 3vmin;
+			}
+			paper-button.disabled {
+				background-color: var(--opr-color-2-200);
+				color: var(--opr-color-2-800);
+			}
+
+			iron-pages {
+				height: 100%;
+			}
+		</style>
+
+		<iron-location path="{{path}}"></iron-location>
+
+		<paper-scroll-header-panel fixed>
+			<paper-toolbar>
+				<div>
+					<span class="hostname">[[title]]</span>
+				</div>
+
+				<div id="navButtons">
+					<paper-button on-tap="onNavTap" data-path="/" class="navButton">
+						Remote
+					</paper-button>
+					<paper-button on-tap="onNavTap" data-path="/browse" class="navButton">
+						Browse
+					</paper-button>
+					<paper-button on-tap="onNavTap" data-path="/random-settings" class="navButton">
+						Settings
+					</paper-button>
+				</div>
+			</paper-toolbar>
+
+			<iron-pages
+				selected="[[path]]"
+				attr-for-selected="name"
+				role="main">
+
+				<opr-remote name="/"></opr-remote>
+				<opr-random-settings name="/random-settings" use-saved-settings="true"></opr-random-settings>
+				<opr-browse name="/browse"></opr-browse>
+			</iron-pages>
+		</paper-scroll-header-panel>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-app',
+
+			properties: {
+				path: {
+					type: String,
+					observer: 'pathChanged',
+				},
+				title: {
+					type: String,
+					value: 'OMX Remote',
+				},
+			},
+
+			ready: function() {
+				let domain = window.location.hostname.toUpperCase(),
+					domainPieces = domain.split('.');
+
+				if (!Array.isArray(domainPieces) || 1 === domainPieces.length) {
+					this.title = domain;
+				} else {
+					let titleArray = [];
+
+					for (let i = 0; i < (domainPieces.length - 1); i++) {
+						titleArray.push(domainPieces[i]);
+					}
+
+					this.title = titleArray.join('.');
+				}
+			},
+
+			pathChanged: function() {
+				const navButtons = document.querySelectorAll('.navButton');
+				for (let i = 0; i < navButtons.length; i++) {
+					if (navButtons[i].getAttribute('data-path') === this.path) {
+						navButtons[i].classList.add('disabled');
+					} else {
+						navButtons[i].classList.remove('disabled');
+					}
+				}
+			},
+
+			onNavTap: function(e) {
+				const newPath = e.target.getAttribute('data-path');
+
+				this.path = newPath;
+			},
+		});
+	</script>
+</dom-module>

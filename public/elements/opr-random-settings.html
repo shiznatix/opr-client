@@ -1,0 +1,158 @@
+<dom-module id="opr-random-settings">
+	<template>
+		<style include="opr-shared-styles">
+			opr-loading {
+				height: 100%;
+				@apply(--layout-vertical);
+			}
+			.showlistContainer {
+				background-color: var(--opr-color-700);
+				margin: 0.5vmin;
+				border-radius: 2vmin;
+				padding: 1vmin;
+			}
+			.text {
+				font-size: 7vmin;
+			}
+		</style>
+
+		<iron-location path="{{path}}"></iron-location>
+
+		<iron-ajax
+			id="randomSettingsAjax"
+			url="/shows"
+			handle-as="json"
+			last-response="{{ajaxResponse}}"
+			on-response="responseSuccess"
+			on-error="responseError">
+		</iron-ajax>
+
+		<iron-accordions id="showCategoryAccordions">
+			<template is="dom-repeat" items="[[ajaxResponse.data]]">
+				<iron-accordion>
+					<h2 header>[[item.categoryName]]</h2>
+
+					<div class="showlistContainer">
+						<template is="dom-repeat" items="[[item.shows]]">
+							<div class="listEntry">
+								<paper-checkbox value="[[item]]" on-change="checkboxChanged" checked="[[checkboxChecked(item, selectedShowNames)]]">[[item]]</paper-checkbox>
+							</div>
+						</template>
+					</div>
+				</iron-accordion>
+			</template>
+		</iron-accordions>
+
+		<opr-loading class="centerContainer centerVertical" id="loadingContainer"></opr-loading>
+
+		<div class="centerContainer centerVertical" id="errorContainer">
+			<div class="centerVerticalContent">
+				<div class="text">
+					Could not load show categories
+				</div>
+				<div>
+					<paper-button on-tap="reload">Retry</paper-button>
+				</div>
+			</div>
+		</div>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-random-settings',
+
+			properties: {
+				path: {
+					type: String,
+					observer: 'pathChanged',
+				},
+				useSavedSettings: {
+					type: Boolean,
+					value: false,
+				},
+				selectedShowNames: {
+					type: Array,
+					value: [],
+				},
+			},
+
+			pathChanged: function() {
+				if ('/random-settings' === this.path) {
+					this.reload();
+				}
+			},
+
+			ready: function() {
+				// only set if we care about saving the shows
+				if (!this.useSavedSettings) {
+					return;
+				}
+
+				try {
+					this.selectedShowNames = JSON.parse(localStorage.getItem('randomShows'));
+				} catch (e) {
+					this.selectedShowNames = [];
+				}
+
+				// ensure the parsed JSON is an array
+				this.setSelectedShowNames((Array.isArray(this.selectedShowNames) ? this.selectedShowNames : []));
+			},
+
+			reload: function() {
+				this.setVisibleLayout('loading');
+
+				this.$.randomSettingsAjax.generateRequest();
+			},
+
+			responseSuccess: function() {
+				this.setVisibleLayout('categories');
+			},
+
+			responseError: function() {
+				this.setVisibleLayout('error');
+			},
+
+			setVisibleLayout: function(layout) {
+				this.$.loadingContainer.hidden = true;
+				this.$.showCategoryAccordions.hidden = true;
+				this.$.errorContainer.hidden = true;
+
+				if ('loading' === layout) {
+					this.$.loadingContainer.hidden = false;
+				} else if ('categories' === layout) {
+					this.$.showCategoryAccordions.hidden = false;
+				} else if ('error' === layout) {
+					this.$.errorContainer.hidden = false;
+				}
+			},
+
+			checkboxChecked: function(showName) {
+				//console.log(showName);
+				return (this.selectedShowNames.indexOf(showName) > -1 ? 'checked' : '');
+			},
+
+			checkboxChanged: function(event) {
+				const showName = event.target.value,
+					checked = event.target.checked,
+					index = this.selectedShowNames.indexOf(showName);
+
+				if (!checked && index > -1) {
+					this.selectedShowNames.splice(index, 1);
+				} else if (checked && -1 === index) {
+					this.selectedShowNames.push(showName);
+				}
+
+				if (this.useSavedSettings) {
+					localStorage.setItem('randomShows', JSON.stringify(this.selectedShowNames));
+				}
+			},
+
+			getSelectedShowNames: function() {
+				return this.selectedShowNames;
+			},
+
+			setSelectedShowNames: function(selectedShowNames) {
+				this.selectedShowNames = selectedShowNames;
+			},
+		});
+	</script>
+</dom-module>

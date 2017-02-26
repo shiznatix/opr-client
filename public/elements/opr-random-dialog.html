@@ -1,0 +1,119 @@
+<dom-module id="opr-random-dialog">
+	<template>
+		<style include="opr-shared-styles">
+			.left {
+				float: left;
+			}
+			.right {
+				float: right;
+			}
+			.flex-horizontal {
+				@apply(--layout-horizontal);
+				@apply(--layout-flex);
+			}
+			paper-radio-group {
+				flex-basis: 20%;
+			}
+			opr-random-settings {
+				flex-basis: 80%;
+			}
+		</style>
+
+		<paper-dialog
+			entry-animation="scale-up-animation"
+			exit-animation="fade-out-animation"
+			on-iron-overlay-closed="dialogClosed"
+			id="randomDialog">
+
+			<h2>
+				<span class="left">Random</span>
+				<iron-icon icon="icons:dashboard" on-tap="randomShowsTapped" class="right"></iron-icon>
+			</h2>
+
+			<paper-dialog-scrollable>
+				<div class="flex-horizontal">
+					<paper-radio-group selected="{{amount}}" attr-for-selected="value">
+						<paper-radio-button value="1">1</paper-radio-button>
+						<br />
+						<paper-radio-button value="2">2</paper-radio-button>
+						<br />
+						<paper-radio-button value="3">3</paper-radio-button>
+						<br />
+						<paper-radio-button value="5">5</paper-radio-button>
+						<br />
+						<paper-radio-button value="10">10</paper-radio-button>
+						<br />
+					</paper-radio-group>
+
+					<opr-random-settings id="randomShowSettings"></opr-random-settings>
+				</div>
+			</paper-dialog-scrollable>
+
+			<div class="buttons">
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button dialog-confirm on-tap="enqueuePressed">Enqueue</paper-button>
+				<paper-button dialog-confirm on-tap="playPressed">Play</paper-button>
+			</div>
+		</paper-dialog>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-random-dialog',
+
+			randomCallback: null,
+
+			properties: {
+				amount: {
+					type: Number,
+					value: 5,
+				},
+			},
+
+			open: function(randomCallback) {
+				this.randomCallback = randomCallback;
+				this.$.randomDialog.open();
+				this.$.randomShowSettings.hidden = true;
+				this.$.randomShowSettings.reload();
+			},
+
+			dialogClosed: function() {
+				// empty out list
+				this.$.randomShowSettings.setSelectedShowNames([]);
+			},
+
+			getRandomShowNames: function() {
+				const selectedShowNames = this.$.randomShowSettings.getSelectedShowNames();
+
+				if (selectedShowNames.length > 0) {
+					return selectedShowNames;
+				}
+
+				// we didn't have any custom-for-this-request shows, use the saved ones
+				let savedShowNames = [];
+
+				try {
+					savedShowNames = JSON.parse(localStorage.getItem('randomShows'));
+				} catch (e) {
+				}
+
+				return (Array.isArray(savedShowNames) ? savedShowNames : []);
+			},
+
+			enqueuePressed: function() {
+				this.randomCallback('enqueue', this.amount, this.getRandomShowNames());
+			},
+
+			playPressed: function() {
+				this.randomCallback('play', this.amount, this.getRandomShowNames());
+			},
+
+			randomShowsTapped: function() {
+				this.$.randomShowSettings.hidden = !this.$.randomShowSettings.hidden;
+
+				this.async(() => {
+					this.$.randomDialog.notifyResize();
+				});
+			},
+		});
+	</script>
+</dom-module>

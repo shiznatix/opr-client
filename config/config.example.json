@@ -1,0 +1,35 @@
+{
+  "theme": {
+    "icon": "launcher-icon-96.png",
+
+    "baseColor": "#000000",
+
+    "color100": "var(--paper-blue-grey-100)",
+    "color200": "var(--paper-blue-grey-200)",
+    "color300": "var(--paper-blue-grey-300)",
+    "color400": "var(--paper-blue-grey-400)",
+    "color500": "var(--paper-blue-grey-500)",
+    "color600": "var(--paper-blue-grey-600)",
+    "color700": "var(--paper-blue-grey-700)",
+    "color800": "var(--paper-blue-grey-800)",
+    "color900": "var(--paper-blue-grey-900)",
+
+    "secondaryColor200": "var(--paper-blue-200)",
+    "secondaryColor800": "var(--paper-blue-800)",
+    "secondaryColor900": "var(--paper-blue-900)"
+  },
+  "port": 9091,
+  "serverHost": "http://localhost:9090",
+  "defaultVolume": 0,
+  "playableExtensions": [
+    "mkv",
+    "mpg",
+    "mpeg",
+    "avi",
+    "mp4",
+    "wmv",
+    "ogg",
+    "ogv",
+    "ogm"
+  ]
+}

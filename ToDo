@@ -1,0 +1,30 @@
+Create install script
+	deps:
+		- sshfs (maybe, if client and server is not local)
+
+Git hooks:
+	- On commit this should be run and auto-added if changed:
+		vulcanize -p ./ elements/elements.html -o elements/elements.vulcanized.html
+
+Init script should be fixed
+	- Log file will grow too large
+
+Should we have in config the folder mappings from server to client for random plays? This should be configurable somewhat.
+	- Remove mount bash file
+	- On start, ensure these folders exist and maybe even try to mount if server is not local
+
+Styles:
+	- Browse page is different from all other pages. Make browse page normal
+	- When random-settings ajax fails, an error message is displayed. Get vertical centering to work with this
+
+Browse page:
+	- allow sorting the list by title or update time asc / desc
+	- add side bar alphabet for fast scrolling in movies folder
+	- long file names break the view. maybe this happens on other views too like random settings?
+	- going from a small list to a big one doesnt seem to trigger view change
+
+Remote page:
+	- remove swipe action, just switch pages when the circles on the bottom are pressed
+
+Random:
+	- Fix random to only select 1 show and weight on last played time

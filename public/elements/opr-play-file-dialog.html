@@ -1,0 +1,107 @@
+<dom-module id="opr-play-file-dialog">
+	<template>
+		<style include="opr-shared-styles">
+			paper-radio-button {
+				width: 100%;
+			}
+
+			.showName {
+				font-size: 2vmin;
+				color: var(--opr-color-400);
+			}
+		</style>
+
+		<iron-ajax
+			id="currentPlaylistAjax"
+			url="/current-playlist"
+			handle-as="json"
+			last-response="{{ajaxResponse}}"
+			on-response="handleResponse">
+		</iron-ajax>
+
+		<paper-dialog
+			entry-animation="scale-up-animation"
+			exit-animation="fade-out-animation"
+			on-iron-overlay-opened="opened"
+			id="playFileDialog">
+
+			<h2>Play file</h2>
+
+			<paper-dialog-scrollable>
+				<div class="centerText">
+					<paper-spinner active id="playFileLoadingSpinner"></paper-spinner>
+				</div>
+
+				<paper-radio-group on-change="indexOnChange" id="indexRadio" attr-for-selected="value">
+					<template is="dom-repeat" items="[[ajaxResponse.data]]">
+						<paper-radio-button value="[[index]]">
+							<div class="fileName">
+								[[item.fileName]]
+							</div>
+							<div class="showName">
+								[[item.showName]]
+							</div>
+						</paper-radio-button>
+						<br />
+					</template>
+				</paper-radio-group>
+			</paper-dialog-scrollable>
+
+			<div class="buttons">
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button dialog-confirm disabled id="playButton" on-tap="playPressed">Play</paper-button>
+			</div>
+		</paper-dialog>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-play-file-dialog',
+
+			selectedIndex: -1,
+			playIndexCallback: null,
+
+			clearSelectedIndex: function() {
+				this.$.indexRadio.select(-1);
+				this.selectedIndex = -1;
+				this.$.playButton.disabled = true;
+			},
+
+			open: function(playIndexCallback) {
+				this.playIndexCallback = playIndexCallback;
+				this.clearSelectedIndex();
+				this.$.indexRadio.hidden = true;
+				this.$.playFileLoadingSpinner.hidden = false;
+				this.$.playFileDialog.open();
+			},
+
+			opened: function() {
+				this.$.currentPlaylistAjax.generateRequest();
+			},
+
+			handleResponse: function() {
+				this.clearSelectedIndex();
+				this.$.indexRadio.hidden = false;
+				this.$.playFileLoadingSpinner.hidden = true;
+
+				this.async(() => {
+					this.$.playFileDialog.notifyResize();
+				});
+			},
+
+			indexOnChange: function(e) {
+				const target = e.target;
+
+				this.selectedIndex = target.value;
+				this.$.playButton.disabled = false;
+			},
+
+			playPressed: function(e) {
+				if (this.selectedIndex < 0) {
+					return;
+				}
+
+				this.playIndexCallback(this.selectedIndex);
+			},
+		});
+	</script>
+</dom-module>

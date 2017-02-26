@@ -1,0 +1,87 @@
+<dom-module id="opr-insert-at-dialog">
+	<template>
+		<style include="opr-shared-styles"></style>
+
+		<iron-ajax
+			id="currentPlaylistAjax"
+			url="/current-playlist"
+			handle-as="json"
+			last-response="{{ajaxResponse}}"
+			on-response="handleResponse">
+		</iron-ajax>
+
+		<paper-dialog
+			entry-animation="scale-up-animation"
+			exit-animation="fade-out-animation"
+			on-iron-overlay-opened="opened"
+			id="insertAtDialog">
+
+			<h2>Insert at</h2>
+
+			<paper-dialog-scrollable>
+				<paper-radio-group on-change="indexOnChange" id="indexRadio" attr-for-selected="value">
+					<template is="dom-repeat" items="[[ajaxResponse.data]]">
+						<paper-radio-button value="[[index]]">[[item.fileName]]</paper-radio-button>
+						<br />
+					</template>
+
+					<paper-radio-button value="-1">--Enqueue--</paper-radio-button>
+				</paper-radio-group>
+			</paper-dialog-scrollable>
+
+			<div class="buttons">
+				<paper-button dialog-dismiss>Cancel</paper-button>
+				<paper-button dialog-confirm disabled id="insertAtButton" on-tap="insertAtPressed">Insert at</paper-button>
+			</div>
+		</paper-dialog>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-insert-at-dialog',
+
+			selectedIndex: -1,
+			insertAtCallback: null,
+
+			clearSelectedIndex: function() {
+				this.$.indexRadio.select(-1);
+				this.selectedIndex = -1;
+				this.$.insertAtButton.disabled = true;
+			},
+
+			open: function(insertAtCallback) {
+				this.insertAtCallback = insertAtCallback;
+				this.clearSelectedIndex();
+				this.$.indexRadio.hidden = true;
+				this.$.insertAtDialog.open();
+			},
+
+			opened: function() {
+				this.$.currentPlaylistAjax.generateRequest();
+			},
+
+			handleResponse: function() {
+				this.clearSelectedIndex();
+				this.$.indexRadio.hidden = false;
+
+				this.async(() => {
+					this.$.insertAtDialog.notifyResize();
+				});
+			},
+
+			indexOnChange: function(e) {
+				const target = e.target;
+
+				this.selectedIndex = target.value;
+				this.$.insertAtButton.disabled = false;
+			},
+
+			insertAtPressed: function(e) {
+				if (this.selectedIndex < 0) {
+					this.insertAtCallback(this.ajaxResponse.data.length);
+				} else {
+					this.insertAtCallback(this.selectedIndex);
+				}
+			},
+		});
+	</script>
+</dom-module>

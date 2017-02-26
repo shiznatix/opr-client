@@ -1,0 +1,364 @@
+<dom-module id="opr-browse">
+	<template>
+		<style include="opr-shared-styles">
+			.centerContainer {
+				height: 100%;
+				@apply(--layout-vertical);
+				background-color: var(--opr-color-700);
+			}
+
+			#currentPathContainer {
+				@apply(--layout-horizontal);
+				background-color: var(--opr-color-200);
+				color: var(--opr-color-900);
+				align-items: center;
+				height: 10vmin;
+			}
+			#currentPath {
+				@apply(--layout-flex);
+				padding: 0.5vmin;
+				white-space: nowrap;
+				overflow: hidden;
+				text-align: left;
+				direction: rtl;
+				height: 100%;
+				/*
+				-webkit-mask-image: -webkit-linear-gradient(right, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
+				*/
+			}
+			#currentPathContainer paper-button {
+				font-size: 3vmin;
+				padding: 1vmin;
+				margin: 0;
+				min-width: 0;
+			}
+			#backButton {
+				margin-left: 15px;
+			}
+			#backButton iron-icon {
+				width: 3vmin;
+				height: 3vmin;
+			}
+
+			iron-list {
+				@apply(--layout-flex);
+			}
+
+			.unclickable {
+				color: black;
+			}
+
+			#playEuqueueButtons {
+				@apply(--layout-horizontal);
+				height: 10vh;
+				margin-bottom: 1vh;
+				margin-top: 1vh;
+			}
+			.playEuqueueButton {
+				@apply(--layout-flex);
+			}
+
+			.centerVerticalContent .text {
+				font-size: 8vmin;
+				margin-bottom: 2vh;
+			}
+			.centerVerticalContent paper-button {
+				font-size: 8vmin;
+			}
+		</style>
+
+		<iron-location path="{{path}}"></iron-location>
+
+		<iron-ajax
+			id="browseAjax"
+			url="/browse-server"
+			handle-as="json"
+			debounce-duration="300"
+			method="POST"
+			content-type="application/json"
+			on-response="browseResponseSuccess"
+			on-error="browseResponseError">
+		</iron-ajax>
+		<iron-ajax
+			id="playEuqueueAjax"
+			handle-as="json"
+			method="POST"
+			content-type="application/json"
+			on-response="playEnqueueResponse">
+		</iron-ajax>
+
+		<div class="centerContainer" id="browseContainer">
+			<div id="currentPathContainer">
+				<div id="currentPath">
+					<template is="dom-repeat" items="[[breadcrumbs]]">
+						<paper-button on-tap="onBreadcrumTapped" item="[[item]]" class="breadcrumb">[[item.dir]]</paper-button>
+					</template>
+					<paper-button on-tap="onBreadcrumTapped" class="breadcrumb">/</paper-button>
+				</div>
+				<div>
+					<paper-button on-tap="onBackTap" id="backButton">
+						<iron-icon icon="icons:reply"></iron-icon>Back
+					</paper-button>
+				</div>
+			</div>
+
+			<iron-list items="[[folderContents]]">
+				<template>
+					<div class="listEntry" on-tap="onTap" file="[[item]]">
+						<template is="dom-if" if="[[item.isPlayable]]">
+							<paper-checkbox value="[[item.fullPath]]" on-change="checkboxChanged">
+								<span class="text">[[item.name]]</span>
+							</paper-checkbox>
+						</template>
+						<template is="dom-if" if="[[!item.isPlayable]]">
+							<iron-icon icon="[[getIcon(item)]]"></iron-icon>
+							<span class$="{{getUnplayableClasses(item)}}">[[item.name]]</span>
+						</template>
+					</div>
+				</template>
+			</iron-list>
+
+			<div id="playEuqueueButtons">
+				<paper-button raised on-tap="enqueueSelected" class="playEuqueueButton" id="browseEnqueueButton" disabled>Enqueue</paper-button>
+				<paper-button raised on-tap="insertAtSelected" class="playEuqueueButton" id="browseInsertAtButton" disabled>Insert at</paper-button>
+				<paper-button raised on-tap="playSelected" class="playEuqueueButton" id="browsePlayButton" disabled>Play</paper-button>
+			</div>
+		</div>
+
+		<div class="centerContainer centerVertical" id="errorContainer">
+			<div class="centerVerticalContent">
+				<div class="text">
+					Unable to read from server.
+				</div>
+				<div>
+					<paper-button on-tap-"retryTapped">Retry</paper-button>
+				</div>
+			</div>
+		</div>
+
+		<opr-loading class="centerContainer centerVertical" id="loadingContainer"></opr-loading>
+
+		<opr-insert-at-dialog id="insertAtDialogElement"></opr-insert-at-dialog>
+
+		<opr-toast id="browseToast"></opr-toast>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-browse',
+
+			properties: {
+				path: {
+					type: String,
+					observer: 'pathChanged',
+				},
+				breadcrumbs: {
+					type: Array,
+					value: [],
+				},
+				folderContents: {
+					type: Array,
+					value: [],
+				},
+				currentFullPath: {
+					type: String,
+					value: '/',
+				},
+			},
+
+			attemptedFullPath: '/',
+			selectedFiles: [],
+
+			sendRequest: function(dir) {
+				this.setVisibleLayout('loading');
+				this.attemptedFullPath = dir;
+				this.$.browseAjax.body = JSON.stringify({
+					dir: dir,
+				});
+				this.$.browseAjax.generateRequest();
+			},
+
+			pathChanged: function() {
+				if ('/browse' === this.path) {
+					const latestBrowseFullPath = localStorage.getItem('latestBrowseFullPath');
+
+					this.sendRequest((latestBrowseFullPath ? latestBrowseFullPath : '/'));
+				}
+			},
+
+			getIcon: function(item) {
+				if (item.isDir) {
+					return 'icons:folder';
+				}
+
+				return 'icons:clear';
+			},
+
+			getUnplayableClasses: function(item) {
+				let classes = [
+					'text',
+				];
+
+				if (!item.isDir) {
+					classes.push('unclickable');
+				}
+
+				return classes.join(' ');
+			},
+
+			onTap: function(event) {
+				const file = event.currentTarget.file;
+
+				if (file.isDir) {
+					this.sendRequest(file.fullPath);
+				}
+			},
+
+			onBackTap: function() {
+				// TODO Warning! this is not correct when we have the breadcrumbs "reversed"
+				this.breadcrumbs.pop();
+
+				let dir;
+
+				if (0 === this.breadcrumbs.length) {
+					dir = '/';
+				} else {
+					dir = this.breadcrumbs[this.breadcrumbs.length - 1].fullPath;
+				}
+
+				this.sendRequest(dir);
+			},
+
+			onBreadcrumTapped: function(event) {
+				const item = event.target.item,
+					fullPath = (item ? item.fullPath : '/');
+
+				// even if its the same as the current full path, do it.
+				// its a good way to be able to refresh via button
+				this.sendRequest(fullPath);
+			},
+
+			retryTapped: function() {
+				this.sendRequest('/');
+			},
+
+			setBreadcrumbs: function(fullPath) {
+				const parts = fullPath.split('/');
+				let breadcrumbs = [],
+					currentFullPath = '/';
+
+				for (let i = 0; i < parts.length; i++) {
+					const part = parts[i];
+
+					if ('' === part) {
+						continue;
+					}
+
+					currentFullPath = ('/' === currentFullPath ? `/${part}` : `${currentFullPath}/${part}`),
+
+					breadcrumbs.push({
+						dir: part,
+						fullPath: currentFullPath,
+					});
+				}
+
+				this.breadcrumbs = breadcrumbs.reverse();
+			},
+
+			browseResponseSuccess: function() {
+				const response = this.$.browseAjax.lastResponse.data;
+
+				this.currentFullPath = this.attemptedFullPath;
+				this.selectedFiles = [];
+				this.setBrowseButtonsDisabled(true);
+				localStorage.setItem('latestBrowseFullPath', this.currentFullPath);
+				this.setBreadcrumbs(this.currentFullPath);
+				this.folderContents = response;
+				this.setVisibleLayout('browse');
+			},
+
+			browseResponseError: function(event) {
+				const attemptedRoot = ('/' === this.attemptedFullPath);
+
+				// we have not gotten a good response at all yet & we didn't try to get root
+				if ('/' === this.currentFullPath && !attemptedRoot) {
+					this.sendRequest('/');
+				} else if (!attemptedRoot) {
+					this.setVisibleLayout('browse');
+					this.$.browseToast.toastMessage(`Failed to load "${this.attemptedFullPath}"`);
+				} else {
+					this.setVisibleLayout('error');
+				}
+			},
+
+			checkboxChanged: function(event) {
+				const target = event.target,
+					index = this.selectedFiles.indexOf(target.value);
+
+				if (target.checked) {
+					this.selectedFiles.push(target.value);
+				} else if (index > -1) {
+					this.selectedFiles.splice(index, 1);
+				}
+
+				this.setBrowseButtonsDisabled((0 === this.selectedFiles.length));
+			},
+
+			setVisibleLayout: function(layout) {
+				this.$.loadingContainer.hidden = true;
+				this.$.browseContainer.hidden = true;
+				this.$.errorContainer.hidden = true;
+
+				if ('loading' === layout) {
+					this.$.loadingContainer.hidden = false;
+				} else if ('browse' === layout) {
+					this.$.browseContainer.hidden = false;
+				} else if ('error' === layout) {
+					this.$.errorContainer.hidden = false;
+				}
+			},
+
+			setBrowseButtonsDisabled: function(disabled) {
+				this.$.browseEnqueueButton.disabled = disabled;
+				this.$.browseInsertAtButton.disabled = disabled;
+				this.$.browsePlayButton.disabled = disabled;
+			},
+
+			enqueueSelected: function() {
+				this.$.playEuqueueAjax.url = '/enqueue-playlist';
+				this.$.playEuqueueAjax.body = JSON.stringify({
+					filePaths: this.selectedFiles,
+				});
+				this.$.playEuqueueAjax.generateRequest();
+			},
+
+			insertAtSelected: function() {
+				this.$.insertAtDialogElement.open((atIndex) => {
+					this.$.playEuqueueAjax.url = '/set-at-playlist';
+					this.$.playEuqueueAjax.body = JSON.stringify({
+						atIndex: atIndex,
+						filePaths: this.selectedFiles,
+					});
+					this.$.playEuqueueAjax.generateRequest();
+				});
+			},
+
+			playSelected: function() {
+				this.$.playEuqueueAjax.url = '/set-playlist';
+				this.$.playEuqueueAjax.body = JSON.stringify({
+					filePaths: this.selectedFiles,
+				});
+				this.$.playEuqueueAjax.generateRequest();
+			},
+
+			playEnqueueResponse: function(e) {
+				let paperCheckboxes = this.querySelectorAll('paper-checkbox');
+				this.selectedFiles = [];
+
+				for (let i = 0; i < paperCheckboxes.length; i++) {
+					paperCheckboxes[i].checked = false;
+				}
+				this.$.browseToast.toastFromPlaylistEvent(e);
+			},
+		});
+	</script>
+</dom-module>

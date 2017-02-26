@@ -1,0 +1,191 @@
+<dom-module id="opr-remote">
+	<template>
+		<style include="opr-shared-styles">
+			#remoteContainer {
+				height: 100%;
+				@apply(--layout-vertical);
+			}
+			iron-swipeable-pages {
+				@apply(--layout-flex);
+			}
+
+			paper-button {
+				width: 100%;
+			}
+			.page {
+				height: 100%;
+				@apply(--layout-vertical);
+			}
+			.flex-horizontal {
+				@apply(--layout-horizontal);
+				@apply(--layout-flex);
+				margin-top: 5px;
+				margin-bottom: 5px;
+			}
+
+			#pagesIndicator {
+				width: 100%;
+				text-align: center;
+			}
+			#pagesIndicatorIcons {
+				margin-left: auto;
+				margin-right: auto;
+			}
+		</style>
+
+		<iron-location path="{{path}}"></iron-location>
+
+		<iron-ajax
+			id="commandAjax"
+			handle-as="json"
+			on-response="handleResponse">
+		</iron-ajax>
+
+		<div id="remoteContainer">
+			<iron-swipeable-pages
+				id="swipeablePages"
+				selected="{{selectedPage}}"
+				threshold="0.1">
+
+				<!-- main commands -->
+				<div class="page">
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="previous">Previous</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="next">Next</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="play-pause">Play/Pause</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="play-at">Play file</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="back">Back</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="forward">Forward</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="random">Random</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="volume-down">Vol down</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="volume-up">Vol up</paper-button>
+					</div>
+				</div>
+
+				<!-- additional commands -->
+				<div class="page">
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="back-large">&lt;&lt; Back</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="forward-large">Forward &gt;&gt;</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="decrease-speed">Decrease speed</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="increase-speed">Increase speed</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="previous-audio">Previous audio</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="next-audio">Next audio</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="toggle-subtitles">Toggle subtitles</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="previous-subtitle">Previous subtitle</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="next-subtitle">Next subtitle</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="subtitle-delay-plus">Subtitle delay +</paper-button>
+						<paper-button raised on-tap="onCommandTap" id="subtitle-delay-minus">Subtitle delay -</paper-button>
+					</div>
+
+					<div class="flex-horizontal">
+						<paper-button raised on-tap="onCommandTap" id="stop">Stop</paper-button>
+					</div>
+				</div>
+			</iron-swipeable-pages>
+
+			<div id="pagesIndicator" on-tap="onPageIndicatorTap">
+				<div class="flex-horizontal">
+					<div id="pagesIndicatorIcons">
+						<iron-icon icon="icons:radio-button-checked" id="page1Indicator"></iron-icon>
+						<iron-icon icon="icons:radio-button-unchecked" id="page2Indicator"></iron-icon>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<opr-random-dialog id="randomDialogElement"></opr-random-dialog>
+		<opr-play-file-dialog id="playFileDialogElement"></opr-play-file-dialog>
+
+		<opr-toast id="remoteToast"></opr-toast>
+	</template>
+	<script>
+		Polymer({
+			is: 'opr-remote',
+
+			properties: {
+				path: String,
+				selectedPage: {
+					type: Number,
+					value: 0,
+					observer: 'onPageChange'
+				},
+			},
+
+			sendCommand: function(url, method, body) {
+				this.$.commandAjax.url = `/${url}`;
+				this.$.commandAjax.body = (body ? JSON.stringify(body) : null);
+				this.$.commandAjax.method = method;
+				this.$.commandAjax.contentType = ('POST' === method ? 'application/json' : null);
+				this.$.commandAjax.generateRequest();
+			},
+
+			onCommandTap: function(e) {
+				const id = e.target.getAttribute('id');
+
+				if ('random' === id) {
+					this.$.randomDialogElement.open((method, amount, showNames) => {
+						this.sendCommand('random', 'POST', {
+							method: method,
+							amount: amount,
+							showNames: showNames,
+						});
+					});
+				} else if ('play-at' === id) {
+					this.$.playFileDialogElement.open((playIndex) => {
+						this.sendCommand('play-at', 'POST', {
+							index: playIndex,
+						});
+					});
+				} else {
+					this.sendCommand(id, 'GET');
+				}
+			},
+
+			onPageIndicatorTap: function(e) {
+				this.selectedPage = (0 === this.selectedPage ? 1 : 0);
+			},
+
+			onPageChange: function() {
+				if (0 === this.selectedPage) {
+					this.$.page1Indicator.icon = 'icons:radio-button-checked';
+					this.$.page2Indicator.icon = 'icons:radio-button-unchecked';
+				} else {
+					this.$.page1Indicator.icon = 'icons:radio-button-unchecked';
+					this.$.page2Indicator.icon = 'icons:radio-button-checked';
+				}
+			},
+
+			handleResponse: function(e) {
+				this.$.remoteToast.toastFromPlaylistEvent(e);
+			},
+		});
+	</script>
+</dom-module>
