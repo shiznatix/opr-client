@@ -12,7 +12,45 @@
 if [ "$EUID" -ne 0 ]
 then
 	echo "Please run as root"
-	exit
+	exit 1
+fi
+
+function command_exists {
+    type "$1" &> /dev/null
+}
+
+if ! command_exists node
+then
+	echo "Please install node >= 6"
+	exit 1
+fi
+
+NODE_VERSION=`node -v | sed 's/[^0-9]//g' | cut -c1`
+
+if (($NODE_VERSION < 6))
+then
+	echo "Please install node >= 6"
+	exit 1
+fi
+
+if ! command_exists npm
+then
+	echo "Please install npm"
+	exit 1
+fi
+
+if ! command_exists jq
+then
+	echo "Please install jq"
+	exit 1
+fi
+
+PI_USER_CHECK=`grep -c '^pi:' /etc/passwd`
+
+if [ "$PI_USER_CHECK" -eq "0" ]
+then
+	echo "A user named 'pi' must exist"
+	exit 1
 fi
 
 echo "Installing Omxplayer Remote - Client..."
@@ -34,10 +72,6 @@ then
 else
 	echo "Config file already existed"
 fi
-
-
-echo "Creating theme file..."
-sudo -u pi ./build-theme.sh
 
 INIT_SCRIPT_TEMPLATE=`cat opr-client.template`
 INIT_SCRIPT="${INIT_SCRIPT_TEMPLATE/\%INSTALL_PATH\%/$PWD}"
