@@ -73,6 +73,9 @@ else
 	echo "Config file already existed"
 fi
 
+echo "Bulding theme..."
+sudo -u pi ./build-theme.sh
+
 INIT_SCRIPT_TEMPLATE=`cat opr-client.template`
 INIT_SCRIPT="${INIT_SCRIPT_TEMPLATE/\%INSTALL_PATH\%/$PWD}"
 
