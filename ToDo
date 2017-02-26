@@ -1,7 +1,5 @@
 Create install script
 	deps:
-		- omxplayer (sudo apt-get install omxplayer)
-		- node 6 or greater
 		- sshfs (maybe, if client and server is not local)
 
 Git hooks:
