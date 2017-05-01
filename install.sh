@@ -60,7 +60,6 @@ then
 fi
 
 echo "Installing Omxplayer Remote - Client..."
-exit
 
 cd "$(dirname "$0")"
 

@@ -47,7 +47,7 @@ echo "$SHARED_STYLES" > "public/elements/shared-styles.html"
 cd public
 
 echo "Vulcanize..."
-../node_modules/vulcanize/bin/vulcanize -p ./ elements/elements.html -o elements/elements.vulcanized.html
+../node_modules/vulcanize/bin/vulcanize -p ./ elements/elements.html --out-html elements/elements.vulcanized.html
 
 echo "Theme built!"
 
