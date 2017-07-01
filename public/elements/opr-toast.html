@@ -14,6 +14,7 @@
 				let text = null;
 
 				if (!response.success) {
+					console.log('1');
 					text = response.error;
 				} else if (response.data) {
 					const data = (Array.isArray(response.data) ? response.data : [response.data]);
@@ -22,10 +23,10 @@
 					for (let i = 0; i < data.length; i++) {
 						const show = data[i];
 
-						toastMessages.push(show.fileName);
+						toastMessages.push(`${show.showName} / ${show.fileName}`);
 					}
 
-					this.$.toast.text = toastMessages;
+					text = `<div>${toastMessages.join('<br />')}</div>`;
 				}
 
 				if (text) {
