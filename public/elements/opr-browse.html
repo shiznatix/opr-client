@@ -263,8 +263,16 @@
 
 			sortBy: function(event) {
 				const sortById = event.target.id;
+				
+				localStorage.setItem('browseSortBy', ('sortByModifiedButton' === sortById ? 'modified' : 'name'));
 
-				if ('sortByModifiedButton' === sortById) {
+				this.sort();
+			},
+
+			sort: function() {
+				const sortBy = localStorage.getItem('browseSortBy');
+
+				if ('modified' === sortBy) {
 					this.folderContents.sort((a, b) => {
 						return new Date(b.modifiedDate) - new Date(a.modifiedDate);
 					});
@@ -319,6 +327,7 @@
 				localStorage.setItem('latestBrowseFullPath', this.currentFullPath);
 				this.setBreadcrumbs(this.currentFullPath);
 				this.folderContents = response;
+				this.sort();
 				this.setVisibleLayout('browse');
 			},
 
