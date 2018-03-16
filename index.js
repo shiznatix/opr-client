@@ -1,18 +1,18 @@
-const config = require('./config/config.json'),
-	playerConfig = require('./config/player-config.json'),
-	express = require('express'),
-	bodyParser = require('body-parser'),
-	player = require('./lib/player.js'),
-	Playlist = require('./lib/playlist.js'),
-	playlist = new Playlist(player),
-	server = require('./lib/server.js'),
-	browse = require('./lib/browse.js'),
-	validator = require('./lib/validator.js'),
-	logger = require('./lib/logger.js'),
-	themeWatcher = require('./lib/theme-watcher.js'),
-	_ = require('lodash'),
-	os = require('os'),
-	app = express();
+const config = require('./config/config.json');
+const playerConfig = require('./config/player-config.json');
+const express = require('express');
+const bodyParser = require('body-parser');
+const player = require('./lib/player.js');
+const Playlist = require('./lib/playlist.js');
+const playlist = new Playlist(player);
+const server = require('./lib/server.js');
+const browse = require('./lib/browse.js');
+const validator = require('./lib/validator.js');
+const logger = require('./lib/logger.js');
+const themeWatcher = require('./lib/theme-watcher.js');
+const os = require('os');
+const app = express();
+
 let appServer = null;
 
 process.on('uncaughtException', function (error) {
@@ -24,7 +24,7 @@ process.on('SIGTERM', () => {
 	logger.info('SIGTERM received');
 
 	// if we haven't exited within 2 seconds, just die
-	let killTimeout = setTimeout(() => {
+	const killTimeout = setTimeout(() => {
 		logger.info('SIGTERM - app server not cleanly closed, exiting');
 
 		process.exit(1);
@@ -49,11 +49,11 @@ function errorResponse(response, error, data = null) {
 	}
 
 	const jsonResponse = {
-			success: false,
-			data: data,
-			error: error,
-		},
-		logResponse = JSON.stringify(jsonResponse);
+		success: false,
+		data: data,
+		error: error,
+	};
+	const logResponse = JSON.stringify(jsonResponse);
 
 	logger.error(`400 error response ${logResponse}`);
 
@@ -61,10 +61,10 @@ function errorResponse(response, error, data = null) {
 }
 function successResponse(response, data = null) {
 	const jsonResponse = {
-			success: true,
-			data: data,
-		},
-		logResponse = JSON.stringify(jsonResponse);
+		success: true,
+		data: data,
+	};
+	const logResponse = JSON.stringify(jsonResponse);
 
 	logger.debug(`200 success response ${logResponse}`);
 
@@ -116,7 +116,7 @@ app.get('/browse', (request, response) => {
 });
 
 // API player routes
-_.forEach(playerConfig, (data) => {
+playerConfig.forEach((data) => {
 	app.get(`/${data.route}`, (request, response) => {
 		player.runCommand(data.command);
 		successResponse(response);
@@ -133,7 +133,7 @@ app.get('/current-playlist', (request, response) => {
 	successResponse(response, playlist.get());
 });
 app.post('/set-playlist', (request, response) => {
-	let addedFilePaths = [];
+	const addedFilePaths = [];
 
 	validator.setPlaylist(request.body).then((params) => {
 		addedFilePaths = params.filePaths;
@@ -152,7 +152,7 @@ app.post('/set-playlist', (request, response) => {
 	});
 });
 app.post('/enqueue-playlist', (request, response) => {
-	let addedFilePaths = [];
+	const addedFilePaths = [];
 
 	validator.setPlaylist(request.body).then((params) => {
 		addedFilePaths = params.filePaths;
@@ -170,7 +170,7 @@ app.post('/enqueue-playlist', (request, response) => {
 	});
 });
 app.post('/set-at-playlist', (request, response) => {
-	let addedFilePaths = [];
+	const addedFilePaths = [];
 
 	validator.setAtPlaylist(request.body).then((params) => {
 		addedFilePaths = params.filePaths;
@@ -211,19 +211,19 @@ app.post('/random', (request, response) => {
 
 		return server.random(params.showNames, params.amount);
 	}).then((data) => {
-		let filePaths = [];
+		const filePaths = [];
 
-		_.forEach(data, (show) => {
+		data.forEach((show) => {
 			filePaths.push(show.filePath);
 		});
 
 		if ('enqueue' === params.method) {
 			return playlist.enqueue(filePaths);
-		} else {
-			return playlist.set(filePaths).then(() => {
-				return playlist.playAt(0);
-			});
 		}
+
+		return playlist.set(filePaths).then(() => {
+			return playlist.playAt(0);
+		});
 	}).then(() => {
 		successResponse(response, playlist.get());
 	}).catch((error) => {
@@ -255,14 +255,14 @@ app.get('*', (request, response) => {
 	logger.error('404 request');
 
 	response.status(404).json({
-		'success': false,
-		'data': null,
+		success: false,
+		data: null,
 	});
 });
 
 // Start web server
-playlist.setPlaylistFromFile().finally(() => {
+playlist.setPlaylistFromFile().then(() => {
 	appServer = app.listen(config.port, () => {
-		console.log('Started server (plain text) on port ' + config.port);
+		logger.info(`Started server (plain text) on port ${config.port}`);
 	});
 });
