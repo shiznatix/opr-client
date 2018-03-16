@@ -133,7 +133,7 @@ app.get('/current-playlist', (request, response) => {
 	successResponse(response, playlist.get());
 });
 app.post('/set-playlist', (request, response) => {
-	const addedFilePaths = [];
+	let addedFilePaths = [];
 
 	validator.setPlaylist(request.body).then((params) => {
 		addedFilePaths = params.filePaths;
