@@ -152,7 +152,7 @@ app.post('/set-playlist', (request, response) => {
 	});
 });
 app.post('/enqueue-playlist', (request, response) => {
-	const addedFilePaths = [];
+	let addedFilePaths = [];
 
 	validator.setPlaylist(request.body).then((params) => {
 		addedFilePaths = params.filePaths;
@@ -170,7 +170,7 @@ app.post('/enqueue-playlist', (request, response) => {
 	});
 });
 app.post('/set-at-playlist', (request, response) => {
-	const addedFilePaths = [];
+	let addedFilePaths = [];
 
 	validator.setAtPlaylist(request.body).then((params) => {
 		addedFilePaths = params.filePaths;
