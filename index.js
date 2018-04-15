@@ -41,7 +41,10 @@ process.on('SIGTERM', () => {
 	});
 });
 
-themeWatcher.start();
+// only watch the theme if we are dev
+if ('1' === process.env.DEV) {
+	themeWatcher.start();
+}
 
 function errorResponse(response, error, data = null) {
 	if (error instanceof Error) {
